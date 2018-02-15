@@ -146,7 +146,7 @@ function COverthrowGameMode:OnPlayerClaimedReward( keys )
 	if hero.currentLoot then
 		local loot = hero.currentLoot[option]
 		if loot.lootType == 1 then
-			if not string.match(abilities[loot.content].AbilityBehavior, DOTA_ABILITY_BEHAVIOR_PASSIVE) then
+			if not string.match(abilities[loot.content].AbilityBehavior, "DOTA_ABILITY_BEHAVIOR_PASSIVE") then
 				local free_slot = false
 				for i=1,6 do
 		 			local ab = hero:FindAbilityByName("barebones_empty"..tostring(i))
