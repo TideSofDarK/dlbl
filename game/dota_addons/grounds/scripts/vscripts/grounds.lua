@@ -37,10 +37,6 @@ function GetRandomAbility( owner, allContents )
 	return content
 end
 
-function function_name( ... )
-	-- body
-end
-
 function OnLootChannelSucceeded( owner )
 	local lootTable = LoadKeyValues("scripts/kv/loot.kv")
 	local heroes = LoadKeyValues("scripts/npc/npc_heroes.txt")

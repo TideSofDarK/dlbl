@@ -243,12 +243,12 @@ function COverthrowGameMode:InitGameMode()
 		tPlayerStates[i] = {}
 	end
 
-	-- local kv = LoadKeyValues("scripts/npc/npc_heroes.txt")
-	-- local newKV = {}
-	-- for k,v in pairs(kv) do
-	-- 	newKV[k] = { BaseClass = k, Shit = "Shit" }
-	-- end
-	-- PrintKV(newKV)
+	local kv = LoadKeyValues("scripts/npc/npc_heroes.txt")
+	local newKV = {}
+	for k,v in pairs(kv) do
+		newKV[k] = { BaseClass = k, Shit = "Shit" }
+	end
+	PrintKV(newKV)
 end
 
 ---------------------------------------------------------------------------
