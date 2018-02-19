@@ -1,4 +1,5 @@
 _G.AbilitiesKV = LoadKeyValues("scripts/npc/npc_abilities.txt")
+_G.HeroesKV = LoadKeyValues("scripts/npc/npc_heroes.txt")
 
 function GetRandomAbility( owner, allContents )
 	local ownerAbilities = {}
@@ -114,8 +115,27 @@ function OnLootChannelSucceeded( owner )
 	elseif not tPlayerStates[owner:GetPlayerID()].bStartingAbilityPicked then
 		tPlayerStates[owner:GetPlayerID()].bStartingAbilityPicked = true
 
+		local heroAbilities = {}
+		local heroKV = HeroesKV[owner:GetUnitName()]
+		for i=1,24 do
+			local ab = heroKV["Ability"..tostring(i)]
+			if ab then
+				local isUltimate = AbilitiesKV[ab].AbilityType and string.match(AbilitiesKV[ab].AbilityType, "DOTA_ABILITY_TYPE_ULTIMATE")
+				if not isUltimate and not string.match(ab, "special_bonus_") and not string.match(ab, "generic_hidden") then
+					table.insert(heroAbilities, ab)
+				end
+			end
+		end
+
 		for i=1,3 do
-			table.insert(loot, { lootType = 1, content = GetRandomAbility( owner, lootTable["1"] ) })
+			local newAbility = GetRandomAbility( owner, heroAbilities )
+			for i,v in ipairs(heroAbilities) do
+				if v == newAbility then
+					table.remove(heroAbilities, i)
+					break
+				end
+			end
+			table.insert(loot, { lootType = 1, content = newAbility })
 		end
 	else
 		local function CheckDuplicates(newOption)

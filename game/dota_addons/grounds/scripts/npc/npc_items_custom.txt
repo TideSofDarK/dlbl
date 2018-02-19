@@ -103,7 +103,7 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"               		"item_datadriven"
 		"ID"							"1001"
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"AbilityTextureName"			"item_loot"
 		"Model"							"models/props_gameplay/treasure_chest001.vmdl"
 
@@ -118,7 +118,6 @@
 		"ItemPermanent"					"1"
 		"ItemInitialCharges"			"0"
 		"ItemKillable"					"0"
-		"ItemCastOnPickup"				"1"
 	}
 	//=================================================================================================================
 	// Bag of Gold

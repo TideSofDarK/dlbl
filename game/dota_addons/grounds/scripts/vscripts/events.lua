@@ -232,6 +232,7 @@ function COverthrowGameMode:OnItemPickUp( event )
 		UTIL_Remove( item ) -- otherwise it pollutes the player inventory
 	elseif event.itemname == "item_loot" then
 		OnLootChannelSucceeded( owner )
+		UTIL_Remove( item )
 	end
 end
 
