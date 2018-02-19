@@ -3,7 +3,7 @@
 	"maps"			"forest_solo"
 	"IsPlayable"	"1"
 	"HeroGuidesSupported" "1"
-	"TeamCount" "2"
+	"TeamCount" "4"
 	"mines_trio"
 	{
 					"MaxPlayers"                    "9"
@@ -14,7 +14,7 @@
 	}
 	"forest_solo"
 	{
-					"MaxPlayers"                    "2"
+					"MaxPlayers"                    "4"
 	}
 	"desert_quintet"
 	{
