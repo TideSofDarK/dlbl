@@ -240,6 +240,9 @@ function COverthrowGameMode:OnPlayerClaimedReward( keys )
 			end
 		elseif loot.lootType == 4 then
 			local newHero = PlayerResource:ReplaceHeroWith(pID, loot.content, 0, 0)
+			Timers:CreateTimer(1.0,function() 
+		        newHero:AddItemByName('item_passive_xp')
+		    end)
 		elseif loot.lootType == 5 then
 			hero:AddItemByName(loot.content)
 		end
