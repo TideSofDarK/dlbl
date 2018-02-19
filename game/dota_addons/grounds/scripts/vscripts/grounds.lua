@@ -1,3 +1,46 @@
+_G.AbilitiesKV = LoadKeyValues("scripts/npc/npc_abilities.txt")
+
+function GetRandomAbility( owner, allContents )
+	local ownerAbilities = {}
+	local forcePassive = 0
+	for i=0,23 do
+		local ab = owner:GetAbilityByIndex(i)
+		if ab then
+			if bit.band( ab:GetBehavior(), DOTA_ABILITY_BEHAVIOR_PASSIVE ) ~= DOTA_ABILITY_BEHAVIOR_PASSIVE then
+				forcePassive = forcePassive + 1
+			end
+			table.insert(ownerAbilities, ab:GetName())
+		end
+	end
+
+	local content
+
+	local function CheckAbility(content)
+		if not AbilitiesKV[content] then
+			return false
+		end
+		for k,v in pairs(ownerAbilities) do
+			if v == content then
+				return false
+			end
+		end
+		if forcePassive >= 6 then
+			if not string.match(AbilitiesKV[content].AbilityBehavior, "DOTA_ABILITY_BEHAVIOR_PASSIVE") then
+				return false
+			end
+		end
+		return true
+	end
+
+	content = GetRandomElement(allContents, CheckAbility)
+
+	return content
+end
+
+function function_name( ... )
+	-- body
+end
+
 function OnLootChannelSucceeded( owner )
 	local lootTable = LoadKeyValues("scripts/kv/loot.kv")
 	local heroes = LoadKeyValues("scripts/npc/npc_heroes.txt")
@@ -15,7 +58,7 @@ function OnLootChannelSucceeded( owner )
 		local hero = ""
 
 		local function CheckHero(hero)
-			if not heroes[hero] or hero == "npc_dota_hero_base" or hero == "npc_dota_hero_wisp" then
+			if not heroes[hero] or hero == "npc_dota_hero_base" or hero == "npc_dota_hero_wisp" or hero == "npc_dota_hero_target_dummy" then
 				return false
 			end
 			if GetTableLength(loot) == 0 then
@@ -72,62 +115,75 @@ function OnLootChannelSucceeded( owner )
 			print("Gift:", gift)
 			table.insert(loot, { lootType = 5, content = gift })
 		end
-	else
+	elseif not tPlayerStates[owner:GetPlayerID()].bStartingAbilityPicked then
+		tPlayerStates[owner:GetPlayerID()].bStartingAbilityPicked = true
+
 		for i=1,3 do
-			local lootType = math.random(1, 3)
-			local allContents = lootTable[tostring(lootType)]
-			local content = allContents[tostring(math.random(1, GetTableLength(allContents)))]
-			if lootType == 1 then
-				local function Check()
-					for i=0,23 do
-						local ab = owner:GetAbilityByIndex(i)
-						if ab then
-							if ab:GetName() == content then
-								return false
-							end
-						end
-					end
-					return true
+			table.insert(loot, { lootType = 1, content = GetRandomAbility( owner, lootTable["1"] ) })
+		end
+	else
+		local function CheckDuplicates(newOption)
+			for k,v in pairs(loot) do
+				if v.lootType == newOption.lootType and v.content == newOption.content then
+					return false
 				end
-
-				local limit = 30
-				repeat
-					limit = limit - 1
-					if limit == 0 then
-						lootType = 3
-						content = "xp"
-						break
-					end
-					content = allContents[tostring(math.random(1, GetTableLength(allContents)))]
-				until
-					Check()
-			elseif lootType == 2 then
-				local function Check()
-					for i=0,14 do
-						local item = owner:GetItemInSlot(i)
-						if item then
-							if item:GetName() == content then
-								return false
-							end
-						end
-					end
-					return true
-				end
-
-				local limit = 30
-				repeat
-					limit = limit - 1
-					if limit == 0 then
-						lootType = 3
-						content = "gold"
-						break
-					end
-					content = allContents[tostring(math.random(1, GetTableLength(allContents)))]
-				until
-					Check()
 			end
-			
-			table.insert(loot, { lootType = lootType, content = content })
+
+			return true
+		end
+
+		for i=1,3 do
+			local function RegularDropOption()
+				local loot = {}
+				local lootType = math.random(1, 3)
+				local allContents = lootTable[tostring(lootType)]
+				local content = allContents[tostring(math.random(1, GetTableLength(allContents)))]
+
+				if lootType == 1 then
+					content = GetRandomAbility( owner, allContents )
+					if content == "xp" then
+						lootType = 3
+					end
+				elseif lootType == 2 then
+					local function Check()
+						for i=0,14 do
+							local item = owner:GetItemInSlot(i)
+							if item then
+								if item:GetName() == content then
+									return false
+								end
+							end
+						end
+						return true
+					end
+
+					local limit = 30
+					repeat
+						limit = limit - 1
+						if limit == 0 then
+							lootType = 3
+							content = "gold"
+							break
+						end
+						content = allContents[tostring(math.random(1, GetTableLength(allContents)))]
+					until
+						Check()
+				end
+
+				loot.lootType = lootType
+				loot.content = content
+
+				return loot
+			end
+
+			local newOption
+
+			repeat
+				newOption = RegularDropOption()
+			until
+				CheckDuplicates(newOption)
+				
+			table.insert(loot, newOption)
 		end
 	end
 	owner.currentLoot = loot
@@ -137,7 +193,6 @@ end
 function COverthrowGameMode:OnPlayerClaimedReward( keys )
 	local pID = keys.PlayerID
 	local hero = PlayerResource:GetPlayer(pID):GetAssignedHero()
-	local abilities = LoadKeyValues("scripts/npc/npc_abilities.txt")
 
 	local option = tonumber(keys.option)
 
@@ -146,7 +201,7 @@ function COverthrowGameMode:OnPlayerClaimedReward( keys )
 	if hero.currentLoot then
 		local loot = hero.currentLoot[option]
 		if loot.lootType == 1 then
-			if not string.match(abilities[loot.content].AbilityBehavior, "DOTA_ABILITY_BEHAVIOR_PASSIVE") then
+			if not string.match(AbilitiesKV[loot.content].AbilityBehavior, "DOTA_ABILITY_BEHAVIOR_PASSIVE") then
 				local free_slot = false
 				for i=1,6 do
 		 			local ab = hero:FindAbilityByName("barebones_empty"..tostring(i))

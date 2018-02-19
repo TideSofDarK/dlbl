@@ -103,7 +103,7 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"               		"item_datadriven"
 		"ID"							"1001"
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_CHANNELLED | DOTA_ABILITY_BEHAVIOR_DONT_RESUME_ATTACK | DOTA_ABILITY_BEHAVIOR_DONT_CANCEL_CHANNEL | DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
 		"AbilityTextureName"			"item_loot"
 		"Model"							"models/props_gameplay/treasure_chest001.vmdl"
 
