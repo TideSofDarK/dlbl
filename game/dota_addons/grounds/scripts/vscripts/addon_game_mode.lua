@@ -240,17 +240,12 @@ function COverthrowGameMode:InitGameMode()
 	local timeTxt = string.gsub(string.gsub(GetSystemTime(), ':', ''), '0','')
 	math.randomseed(tonumber(timeTxt))
 
-	_G.tPlayerStates = {}
-	for i=0,DOTA_MAX_PLAYERS do
-		tPlayerStates[i] = {}
-	end
-
-	local kv = LoadKeyValues("scripts/npc/npc_heroes.txt")
-	local newKV = {}
-	for k,v in pairs(kv) do
-		newKV[k] = { BaseClass = k, Shit = "Shit" }
-	end
-	PrintKV(newKV)
+	-- local kv = LoadKeyValues("scripts/npc/npc_heroes.txt")
+	-- local newKV = {}
+	-- for k,v in pairs(kv) do
+	-- 	newKV[k] = { BaseClass = k, Shit = "Shit" }
+	-- end
+	-- PrintKV(newKV)
 end
 
 ---------------------------------------------------------------------------

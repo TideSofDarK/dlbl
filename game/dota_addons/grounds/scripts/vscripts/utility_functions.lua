@@ -195,3 +195,67 @@ function GetRandomElement(list, checker, return_key)
     i = i + 1
   end
 end
+
+function GetRandomElements(list, count, checker, return_key)
+  local newTable = {}
+
+  for k,v in pairs(list) do
+    local skip = false
+    if checker then
+      if return_key then
+        skip = not checker(k)
+      else
+        skip = not checker(v)
+      end
+    end
+    if skip then
+
+    else
+      newTable[k] = v
+    end
+  end
+
+  local tableLength = GetTableLength(newTable)
+  local seeds = {}
+
+  local function Check(number)
+    for k,v in pairs(seeds) do
+      if v == number then
+        return false
+      end
+    end
+    return true
+  end
+
+  for i=1,count do
+    local newSeed
+    
+    repeat
+      newSeed = math.random(1, tableLength)
+    until
+      Check(newSeed)
+
+    table.insert(seeds, newSeed)
+  end
+  local i = 1
+
+  local returnTable = {}
+  local counter = 0
+
+  for k,v in pairs(newTable) do
+    if not Check(i) then
+      if return_key then
+        table.insert(returnTable, k)
+      else
+        table.insert(returnTable, v)
+      end
+      counter = counter + 1
+      if counter == count then
+        break  
+      end
+    end
+    i = i + 1
+  end
+
+  return returnTable
+end

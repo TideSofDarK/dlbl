@@ -32,7 +32,14 @@ function COverthrowGameMode:SpawnLootEntity( spawnPoint )
 	local newItem = CreateItem( "item_loot", nil, nil )
 	local drop = CreateItemOnPositionForLaunch( spawnPoint, newItem )
 	local dropRadius = RandomFloat( self.m_GoldRadiusMin, self.m_GoldRadiusMax )
-	newItem:LaunchLootInitialHeight( false, 0, 500, 0.75, spawnPoint + RandomVector( dropRadius ) )
+	local point = spawnPoint + RandomVector( dropRadius )
+
+	AddFOWViewer(2, point, 256, 5.0, false)
+	AddFOWViewer(3, point, 256, 5.0, false)
+	AddFOWViewer(6, point, 256, 5.0, false)
+	AddFOWViewer(7, point, 256, 5.0, false)
+
+	newItem:LaunchLootInitialHeight( false, 0, 500, 0.75, point )
 	newItem:SetContextThink( "KillLoot", function() return self:KillLoot( newItem, drop ) end, 20 )
 end
 
