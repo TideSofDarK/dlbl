@@ -97,12 +97,87 @@
 	//=================================================================================================================
 	// Loot
 	//=================================================================================================================
-	"item_loot"
+	"item_loot_abilities"
 	{
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"               		"item_datadriven"
 		"ID"							"1001"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityTextureName"			"item_loot"
+		"Model"							"models/props_gameplay/treasure_chest001.vmdl"
+
+		"AbilityChannelTime" 			"4.0"
+
+		// Item Info
+		//-------------------------------------------------------------------------------------------------------------
+		"ItemPurchasable"				"0"
+		"ItemQuality"					"consumable"
+		"ItemStackable"					"0"
+		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
+		"ItemPermanent"					"1"
+		"ItemInitialCharges"			"0"
+		"ItemKillable"					"0"
+	}
+	//=================================================================================================================
+	// Loot
+	//=================================================================================================================
+	"item_loot_supply"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"BaseClass"               		"item_datadriven"
+		"ID"							"1004"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityTextureName"			"item_loot"
+		"Model"							"models/props_gameplay/treasure_chest001.vmdl"
+
+		"AbilityChannelTime" 			"4.0"
+
+		// Item Info
+		//-------------------------------------------------------------------------------------------------------------
+		"ItemPurchasable"				"0"
+		"ItemQuality"					"consumable"
+		"ItemStackable"					"0"
+		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
+		"ItemPermanent"					"1"
+		"ItemInitialCharges"			"0"
+		"ItemKillable"					"0"
+	}
+	//=================================================================================================================
+	// Loot
+	//=================================================================================================================
+	"item_loot_bonuses"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"BaseClass"               		"item_datadriven"
+		"ID"							"1005"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityTextureName"			"item_loot"
+		"Model"							"models/props_gameplay/treasure_chest001.vmdl"
+
+		"AbilityChannelTime" 			"4.0"
+
+		// Item Info
+		//-------------------------------------------------------------------------------------------------------------
+		"ItemPurchasable"				"0"
+		"ItemQuality"					"consumable"
+		"ItemStackable"					"0"
+		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
+		"ItemPermanent"					"1"
+		"ItemInitialCharges"			"0"
+		"ItemKillable"					"0"
+	}
+	//=================================================================================================================
+	// Loot
+	//=================================================================================================================
+	"item_loot_starting"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"BaseClass"               		"item_datadriven"
+		"ID"							"1006"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"AbilityTextureName"			"item_loot"
 		"Model"							"models/props_gameplay/treasure_chest001.vmdl"

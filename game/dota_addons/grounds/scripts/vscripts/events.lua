@@ -70,13 +70,13 @@ function COverthrowGameMode:OnNPCSpawned( event )
 				ParticleManager:SetParticleControlEnt( particleSpawn, PATTACH_ABSORIGIN, spawnedUnit, PATTACH_ABSORIGIN, "attach_origin", spawnedUnit:GetAbsOrigin(), true )
 			end
 		end
-		if not tPlayerStates[spawnedUnit:GetPlayerID()].bFirstSpawn then
-			tPlayerStates[spawnedUnit:GetPlayerID()].bFirstSpawn = true
-			print("bbb")
+		if not PlayerStates[spawnedUnit:GetPlayerID()].bFirstSpawn then
+			PlayerStates[spawnedUnit:GetPlayerID()].bFirstSpawn = true
+
 			Timers:CreateTimer(1.0, function (  )
 				for i=1,3 do
 					local pos = spawnedUnit:GetAbsOrigin() + RotatePosition(Vector(0,0,0), QAngle(0,i * 120,0), spawnedUnit:GetForwardVector()) * 128
-					local item = CreateItem("item_loot", spawnedUnit, spawnedUnit)
+					local item = CreateItem("item_loot_starting", spawnedUnit, spawnedUnit)
 					CreateItemOnPositionSync(spawnedUnit:GetAbsOrigin(), item)
 					item:LaunchLoot(false, 100.0, 0.5, pos)
 				end
@@ -230,8 +230,17 @@ function COverthrowGameMode:OnItemPickUp( event )
 		DoEntFire( "item_spawn_particle_" .. self.itemSpawnIndex, "Stop", "0", 0, self, self )
 		COverthrowGameMode:SpecialItemAdd( event )
 		UTIL_Remove( item ) -- otherwise it pollutes the player inventory
-	elseif event.itemname == "item_loot" then
-		OnLootChannelSucceeded( owner )
+	elseif event.itemname == "item_loot_abilities" then
+		OnAbilityCratePicked( owner )
+		UTIL_Remove( item )
+	elseif event.itemname == "item_loot_supply" then
+		OnSupplyCratePicked( owner )
+		UTIL_Remove( item )
+	elseif event.itemname == "item_loot_bonuses" then
+		OnBonusCratePicked( owner )
+		UTIL_Remove( item )
+	elseif event.itemname == "item_loot_starting" then
+		OnStartingCratePicked( owner )
 		UTIL_Remove( item )
 	end
 end

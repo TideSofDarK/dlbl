@@ -21,20 +21,56 @@ for heroName,data in pairs(HeroesKV) do
 	end
 end
 
+_G.LootTable = {}
+_G.LootTableOverride = LoadKeyValues("scripts/kv/loot.kv")
+
+LootTable.Abilities = {}
+LootTable.Abilities.Common = {}
+LootTable.Abilities.Uncommon = {}
+LootTable.Abilities.Rare = {}
+-- Fill with all hero skills
+for _,t in pairs(HeroAbilities) do
+	for __,ability in pairs(t) do
+		if not LootTableOverride.Abilities.Banned[ability] then
+			LootTable.Abilities.Common[ability] = 1
+		end
+	end
+end
+
+LootTable.Items = LootTableOverride.Items
+LootTable.Gifts = LootTableOverride.Gifts
+LootTable.Bonuses = LootTableOverride.Bonuses
+for k,v in pairs(LootTableOverride.Abilities.Uncommon) do
+	LootTable.Abilities.Common[k] = nil
+	LootTable.Abilities.Uncommon[k] = 1
+end
+for k,v in pairs(LootTableOverride.Abilities.Rare) do
+	LootTable.Abilities.Common[k] = nil
+	LootTable.Abilities.Rare[k] = 1
+end
+
 _G.GROUNDS_MAX_ABILITIES = 12
 
-_G.tPlayerStates = {}
+_G.PlayerStates = {}
 for i=0,DOTA_MAX_PLAYERS do
-	tPlayerStates[i] = {}
-	tPlayerStates[i].AbilitiesKV = LoadKeyValues("scripts/npc/npc_abilities.txt")
-	tPlayerStates[i].RemovedAbilities = 0
-	tPlayerStates[i].ResetKV = (function ()
-		tPlayerStates[i].AbilitiesKV = LoadKeyValues("scripts/npc/npc_abilities.txt")
+	PlayerStates[i] = {}
+	PlayerStates[i].Abilities = shallowcopy(LootTable.Abilities)
+	PlayerStates[i].RemovedAbilities = 0
+	PlayerStates[i].MarkAsUsed = (function (self, quality, ability)
+		print("MarkAsUsed", quality, ability)
+		self.Abilities[quality][ability] = nil
+
+		self.RemovedAbilities = self.RemovedAbilities + 1
+		if AbilitiesCount - self.RemovedAbilities <= 20 then
+			self:ResetKV()
+		end
+	end)
+	PlayerStates[i].ResetKV = (function (self)
+		PlayerStates[i].Abilities = shallowcopy(LootTable.Abilities)
 	end)
 end
 
-function GetRandomAbility( owner, allContents )
-	local pID = owner:GetPlayerOwnerID()
+function GetRandomAbility( owner, allContents, ignore )
 	local ownerAbilities = {}
 	local forcePassive = 0
 	for i=0,23 do
@@ -47,56 +83,132 @@ function GetRandomAbility( owner, allContents )
 		end
 	end
 
-	local content
-
-	local function CheckAbility(content)
-		if not tPlayerStates[pID].AbilitiesKV[content] then
-			return false
-		end
+	local function CheckAbility(ability)
+		-- Check if there is no KV to this ability
+		-- if not PlayerStates[pID].Abilities[ability] then
+		-- 	return false
+		-- end
+		-- Check duplicates (hero)
 		for k,v in pairs(ownerAbilities) do
-			if v == content then
+			if v == ability then
 				return false
 			end
 		end
+		-- Check if passive-only mode
 		if forcePassive >= 6 then
-			if not string.match(tPlayerStates[pID].AbilitiesKV[content].AbilityBehavior, "DOTA_ABILITY_BEHAVIOR_PASSIVE") then
+			if not string.match(AbilitiesKV[ability].AbilityBehavior, "DOTA_ABILITY_BEHAVIOR_PASSIVE") then
 				return false
 			end
 		end
+		-- Check ignore list
+		for k,v in pairs(ignore) do
+			if v == ability then
+				return false
+			end
+		end
+
 		return true
 	end
 
-	content = GetRandomElement(allContents, CheckAbility)
-
-	-- Remove ability from list
-	tPlayerStates[pID].AbilitiesKV[content] = nil
-	
-	-- Reset ability list if ability count is less than 21
-	tPlayerStates[pID].RemovedAbilities = tPlayerStates[pID].RemovedAbilities + 1
-	if AbilitiesCount - tPlayerStates[pID].RemovedAbilities <= 20 then
-		tPlayerStates[pID].ResetKV()
-	end
-
-	return content
+	return GetRandomElement(allContents, CheckAbility)
 end
 
-function OnLootChannelSucceeded( owner )
-	local lootTable = LoadKeyValues("scripts/kv/loot.kv")
+function OnAbilityCratePicked( owner )
+	local loot = {}
+
+	local pID = owner:GetPlayerOwnerID()
+
+	local quality = GetRandomQuality()
+	if quality == "Rare" and GetTableLength(PlayerStates[pID].Abilities[quality]) < 3 then
+		quality = "Uncommon"
+	end
+	if GetTableLength(PlayerStates[pID].Abilities[quality]) < 3 then
+		quality = "Common"
+	end
+
+	local upgradableAbilities = owner:GetAllAbilities()
+	for k,v in pairs(upgradableAbilities) do
+		if v:GetLevel() == v:GetMaxLevel() then
+			upgradableAbilities[v:GetName()] = nil
+		end
+	end
+
+	-- List of all abilities
+	local allContents = {}
+	for k,v in pairs(PlayerStates[pID].Abilities[quality]) do
+		table.insert(allContents, k)
+	end
+
+	local contents = {}
+
+	for i=1,3 do
+		local isUpgrade = math.random(0,1) == 0
+
+		if GetTableLength(upgradableAbilities) > 0 and isUpgrade then
+			local ability = GetRandomElement(upgradableAbilities):GetName()
+			table.insert(contents, ability)
+
+			upgradableAbilities[ability] = nil
+		else
+			local ability = GetRandomAbility( owner, allContents, contents )
+			table.insert(contents, ability)
+
+			-- Remove ability from list
+			PlayerStates[pID]:MarkAsUsed(quality, ability)
+		end
+	end
+
+	for k,v in pairs(contents) do
+		table.insert(loot, { lootType = 1, content = v })
+	end
+
+	owner.currentLoot = loot
+	CustomGameEventManager:Send_ServerToPlayer(owner:GetPlayerOwner(), "grounds_loot_picked", loot)
+end
+
+function OnSupplyCratePicked( owner )
+	local loot = {}
+
+	local quality = GetRandomQuality()
+
+	local contents = GetRandomElements(LootTable.Items[quality], 3, nil, true)
+
+	for k,v in pairs(contents) do
+		table.insert(loot, { lootType = 2, content = v })
+	end
+
+	owner.currentLoot = loot
+	CustomGameEventManager:Send_ServerToPlayer(owner:GetPlayerOwner(), "grounds_loot_picked", loot)
+end
+
+function OnBonusCratePicked( owner )
+	local loot = {}
+
+	local quality = GetRandomQuality()
+
+	local allConents = LootTable.Bonuses[quality]
+	for k,v in pairs(LootTable.Bonuses.Unclassified) do
+		allConents[k] = v
+	end
+
+	local contents = GetRandomElements(LootTable.Items[quality], 3, nil, true)
+
+	for k,v in pairs(contents) do
+		table.insert(loot, { lootType = 3, content = v })
+	end
+
+	owner.currentLoot = loot
+	CustomGameEventManager:Send_ServerToPlayer(owner:GetPlayerOwner(), "grounds_loot_picked", loot)
+end
+
+function OnStartingCratePicked( owner )
 	local heroes = LoadKeyValues("scripts/npc/npc_heroes.txt")
 	local loot = {}
 
 	local pID = owner:GetPlayerID()
 
-	if owner.currentLoot then
-		CustomGameEventManager:Send_ServerToPlayer(owner:GetPlayerOwner(), "grounds_loot_picked", owner.currentLoot)
-		
-		return
-	end
-
-	if not tPlayerStates[pID].bHeroPicked then
-		tPlayerStates[pID].bHeroPicked = true
-
-		local hero = ""
+	if not PlayerStates[pID].bHeroPicked then
+		PlayerStates[pID].bHeroPicked = true
 
 		local function CheckHero(hero)
 			if not heroes[hero] or hero == "npc_dota_hero_base" or hero == "npc_dota_hero_wisp" or hero == "npc_dota_hero_target_dummy" then
@@ -134,13 +246,12 @@ function OnLootChannelSucceeded( owner )
 			return true
 		end
 
-		for i=1,3 do
-			hero = GetRandomElement(heroes, CheckHero, true)
-			print("Hero:", hero)
-			table.insert(loot, { lootType = 4, content = hero })
+		for k,v in pairs(GetRandomElements(heroes, 3, CheckHero, true)) do
+			print("Hero:", v)
+			table.insert(loot, { lootType = 4, content = v })
 		end
-	elseif not tPlayerStates[pID].bGiftPicked then
-		tPlayerStates[pID].bGiftPicked = true
+	elseif not PlayerStates[pID].bGiftPicked then
+		PlayerStates[pID].bGiftPicked = true
 
 		local function CheckGift( gift )
 			for k,v in pairs(loot) do
@@ -152,95 +263,113 @@ function OnLootChannelSucceeded( owner )
 			return true
 		end
 
-		local gifts = GetRandomElements(lootTable.Gifts, 3, CheckGift)
+		local gifts = GetRandomElements(LootTable.Gifts, 3, CheckGift, true)
 		for k,gift in pairs(gifts) do
 			print("Gift:", gift)
 			table.insert(loot, { lootType = 5, content = gift })
 		end
 
-	elseif not tPlayerStates[pID].bStartingAbilityPicked then
-		tPlayerStates[pID].bStartingAbilityPicked = true
+	elseif not PlayerStates[pID].bStartingAbilityPicked then
+		PlayerStates[pID].bStartingAbilityPicked = true
 
 		local abilities = GetRandomElements(HeroAbilities[owner:GetUnitName()], 3)
 		for k,v in pairs(abilities) do
 			table.insert(loot, { lootType = 1, content = v })
 		end
-	else
-		local function CheckDuplicates(newOption)
-			for k,v in pairs(loot) do
-				if v.lootType == newOption.lootType and v.content == newOption.content then
-					return false
-				end
-			end
-
-			return true
-		end
-
-		for i=1,3 do
-			local function RegularDropOption()
-				local lootType = math.random(1, 3)
-
-				if not tPlayerStates[pID].bCompleteBuild then
-					local count = 0
-					for i=0,23 do
-						local ab = owner:GetAbilityByIndex(i)
-						if IsValidEntity(ab) and not string.match(ab:GetName(), "barebones") then
-							count = count + 1
-							if count == GROUNDS_MAX_ABILITIES then
-								tPlayerStates[pID].bCompleteBuild = true
-								break
-							end
-						end
-					end
-				end
-
-				if tPlayerStates[pID].bCompleteBuild then
-					lootType = math.random(2, 3)
-				end
-
-				local loot = {}
-				local allContents = lootTable[tostring(lootType)]
-				local content
-
-				if lootType == 1 then
-					content = GetRandomAbility( owner, allContents )
-					if content == "xp" then
-						lootType = 3
-					end
-				elseif lootType == 2 then
-					local function CheckItem(content)
-						for i=0,14 do
-							local item = owner:GetItemInSlot(i)
-							if item then
-								if item:GetName() == content then
-									return false
-								end
-							end
-						end
-						return true
-					end
-
-					content = GetRandomElement(allContents, CheckItem)
-				else
-					content = GetRandomElement(allContents)
-				end
-
-				loot.lootType = lootType
-				loot.content = content
-
-				return loot
-			end
-
-			local newOption
-
-			repeat
-				newOption = RegularDropOption()
-			until
-				CheckDuplicates(newOption)
-				
-			table.insert(loot, newOption)
-		end
 	end
+
+	owner.currentLoot = loot
+	CustomGameEventManager:Send_ServerToPlayer(owner:GetPlayerOwner(), "grounds_loot_picked", loot)
+end
+
+function OnLootChannelSucceeded( owner )
+	local heroes = LoadKeyValues("scripts/npc/npc_heroes.txt")
+	local loot = {}
+
+	local pID = owner:GetPlayerID()
+
+	if owner.currentLoot then
+		CustomGameEventManager:Send_ServerToPlayer(owner:GetPlayerOwner(), "grounds_loot_picked", owner.currentLoot)
+		
+		return
+	end
+
+
+	local function CheckDuplicates(newOption)
+		for k,v in pairs(loot) do
+			if v.lootType == newOption.lootType and v.content == newOption.content then
+				return false
+			end
+		end
+
+		return true
+	end
+
+	for i=1,3 do
+		local function RegularDropOption()
+			local lootType = math.random(1, 3)
+
+			if not PlayerStates[pID].bCompleteBuild then
+				local count = 0
+				for i=0,23 do
+					local ab = owner:GetAbilityByIndex(i)
+					if IsValidEntity(ab) and not string.match(ab:GetName(), "barebones") then
+						count = count + 1
+						if count == GROUNDS_MAX_ABILITIES then
+							PlayerStates[pID].bCompleteBuild = true
+							break
+						end
+					end
+				end
+			end
+
+			if PlayerStates[pID].bCompleteBuild then
+				lootType = math.random(2, 3)
+			end
+
+			local loot = {}
+			local allContents = lootTable[tostring(lootType)]
+			local content
+
+			if lootType == 1 then
+				content = GetRandomAbility( owner, allContents )
+				if content == "xp" then
+					lootType = 3
+				end
+			elseif lootType == 2 then
+				local function CheckItem(content)
+					for i=0,14 do
+						local item = owner:GetItemInSlot(i)
+						if item then
+							if item:GetName() == content then
+								return false
+							end
+						end
+					end
+					return true
+				end
+
+				content = GetRandomElement(allContents, CheckItem)
+			else
+				content = GetRandomElement(allContents)
+			end
+
+			loot.lootType = lootType
+			loot.content = content
+
+			return loot
+		end
+
+		local newOption
+
+		repeat
+			newOption = RegularDropOption()
+		until
+			CheckDuplicates(newOption)
+			
+		table.insert(loot, newOption)
+	end
+
 	owner.currentLoot = loot
 	CustomGameEventManager:Send_ServerToPlayer(owner:GetPlayerOwner(), "grounds_loot_picked", loot)
 end
@@ -252,49 +381,56 @@ function COverthrowGameMode:OnPlayerClaimedReward( keys )
 	local option = tonumber(keys.option)
 
 	assert(option >= 1 and (option < 4 or option == 4)) -- TODO
-	
+
 	if hero.currentLoot then
 		local loot = hero.currentLoot[option]
 		if loot.lootType == 1 then
-			if not string.match(AbilitiesKV[loot.content].AbilityBehavior, "DOTA_ABILITY_BEHAVIOR_PASSIVE") then
-				local free_slot = false
-				for i=1,6 do
-		 			local ab = hero:FindAbilityByName("barebones_empty"..tostring(i))
-		 			if ab:IsHidden() == false then
-		 				free_slot = ab:GetName()
-		 				break
-		 			end
-		 		end 	
-
-		 		if free_slot then
-					hero:AddAbility(loot.content)
-					hero:SwapAbilities(free_slot, loot.content, false, true)
-		 		end
+			if hero:HasAbility(loot.content) then
+				-- Level up owned ability
+				local ab = hero:FindAbilityByName(loot.content)
+				ab:UpgradeAbility(true)
 			else
-				hero:AddAbility(loot.content)
-			end
+				-- Find slot for active ability
+				if not string.match(AbilitiesKV[loot.content].AbilityBehavior, "DOTA_ABILITY_BEHAVIOR_PASSIVE") then
+					local free_slot = false
+					for i=1,6 do
+			 			local ab = hero:FindAbilityByName("barebones_empty"..tostring(i))
+			 			if ab:IsHidden() == false then
+			 				free_slot = ab:GetName()
+			 				break
+			 			end
+			 		end 	
 
-			if hero:GetLevel() == 1 and hero:GetAbilityPoints() == 1 then
-				hero:FindAbilityByName(loot.content):SetLevel(1)
-				hero:SetAbilityPoints(0)
-			end
-			
-			local ownerOfAbility
-			for k,v in pairs(LoadKeyValues("scripts/npc/npc_heroes.txt")) do
-				for k1,v1 in pairs(v) do
-					if v1 == loot.content then
-						ownerOfAbility = k
+			 		if free_slot then
+						hero:AddAbility(loot.content)
+						hero:SwapAbilities(free_slot, loot.content, false, true)
+			 		end
+				else
+					hero:AddAbility(loot.content)
+				end
+
+				if hero:GetLevel() == 1 and hero:GetAbilityPoints() == 1 then
+					hero:FindAbilityByName(loot.content):SetLevel(1)
+					hero:SetAbilityPoints(0)
+				end
+				
+				local ownerOfAbility
+				for k,v in pairs(LoadKeyValues("scripts/npc/npc_heroes.txt")) do
+					for k1,v1 in pairs(v) do
+						if v1 == loot.content then
+							ownerOfAbility = k
+							break
+						end
+					end
+					if ownerOfAbility then
 						break
 					end
 				end
 				if ownerOfAbility then
-					break
+					PrecacheUnitByNameAsync(ownerOfAbility, function ()
+						
+					end, hero:GetPlayerID())
 				end
-			end
-			if ownerOfAbility then
-				PrecacheUnitByNameAsync(ownerOfAbility, function ()
-					
-				end, hero:GetPlayerID())
 			end
 		elseif loot.lootType == 2 then
 			hero:AddItemByName(loot.content)

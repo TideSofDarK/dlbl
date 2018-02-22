@@ -259,3 +259,26 @@ function GetRandomElements(list, count, checker, return_key)
 
   return returnTable
 end
+
+function GetRandomQuality()
+  local seed = math.random(1, 10)
+  if seed == 10 then
+    return "Rare"
+  elseif seed > 6 then
+    return "Uncommon"
+  else
+    return "Common"
+  end
+end
+
+function CDOTA_BaseNPC:GetAllAbilities()
+  local abilities = {}
+  for i=0,23 do
+    local ab = self:GetAbilityByIndex(i)
+    if IsValidEntity(ab) and not string.match(ab:GetName(), "barebones") then
+      table.insert(abilities, ab)
+    end
+  end
+
+  return abilities
+end

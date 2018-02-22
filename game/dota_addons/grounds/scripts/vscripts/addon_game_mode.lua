@@ -246,6 +246,13 @@ function COverthrowGameMode:InitGameMode()
 	-- 	newKV[k] = { BaseClass = k, Shit = "Shit" }
 	-- end
 	-- PrintKV(newKV)
+
+	-- local kv = LoadKeyValues("scripts/kv/loot.kv")
+	-- local newKV = {}
+	-- for k,v in pairs(kv["1"]) do
+	-- 	newKV[k] = { BaseClass = k, Shit = "Shit" }
+	-- end
+	-- PrintKV(newKV)
 end
 
 ---------------------------------------------------------------------------
