@@ -253,6 +253,22 @@ function COverthrowGameMode:InitGameMode()
 	-- 	newKV[k] = { BaseClass = k, Shit = "Shit" }
 	-- end
 	-- PrintKV(newKV)
+
+	Convars:RegisterCommand( "tc",  Dynamic_Wrap(COverthrowGameMode, 'Test'), "", FCVAR_CHEAT )
+end
+
+function COverthrowGameMode:Test()
+	local cmdPlayer = Convars:GetCommandClient()
+	if cmdPlayer then
+		local playerID = cmdPlayer:GetPlayerID()
+		if playerID ~= nil and playerID ~= -1 then
+			local hero = cmdPlayer:GetAssignedHero()
+
+			local item = CreateItem("item_loot_abilities", hero, spawnedUnit)
+			CreateItemOnPositionSync(hero:GetAbsOrigin(), item)
+			item:LaunchLoot(false, 100.0, 0.5, hero:GetAbsOrigin())
+		end
+	end
 end
 
 ---------------------------------------------------------------------------

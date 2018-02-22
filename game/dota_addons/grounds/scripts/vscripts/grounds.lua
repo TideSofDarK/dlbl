@@ -126,10 +126,10 @@ function OnAbilityCratePicked( owner )
 		quality = "Common"
 	end
 
-	local upgradableAbilities = owner:GetAllAbilities()
-	for k,v in pairs(upgradableAbilities) do
-		if v:GetLevel() == v:GetMaxLevel() then
-			upgradableAbilities[v:GetName()] = nil
+	local upgradableAbilities = {}
+	for k,v in pairs(owner:GetAllAbilities()) do
+		if v:GetLevel() < v:GetMaxLevel() then
+			upgradableAbilities[v:GetName()] = 1
 		end
 	end
 
@@ -145,7 +145,7 @@ function OnAbilityCratePicked( owner )
 		local isUpgrade = math.random(0,1) == 0
 
 		if GetTableLength(upgradableAbilities) > 0 and isUpgrade then
-			local ability = GetRandomElement(upgradableAbilities):GetName()
+			local ability = GetRandomElement(upgradableAbilities, nil, true)
 			table.insert(contents, ability)
 
 			upgradableAbilities[ability] = nil
@@ -406,7 +406,7 @@ function COverthrowGameMode:OnPlayerClaimedReward( keys )
 						hero:SwapAbilities(free_slot, loot.content, false, true)
 			 		end
 				else
-					hero:AddAbility(loot.content)
+					hero:AddAbility(loot.content):SetLevel(1)
 				end
 
 				if hero:GetLevel() == 1 and hero:GetAbilityPoints() == 1 then

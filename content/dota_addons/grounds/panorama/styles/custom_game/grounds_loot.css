@@ -13,7 +13,9 @@
 
 /*	background-image: url("file://{images}/custom_game/xp.png");
 	background-image: url("file://{images}/custom_game/ap.png");
-	background-image: url("file://{images}/custom_game/gold.png");*/
+	background-image: url("file://{images}/custom_game/gold.png");
+	background-image: url("file://{images}/custom_game/levelup.png");
+	*/
 
 	transition-property: blur, transform, opacity, width, height, wash-color, pre-transform-scale2d, saturation;
 	transition-duration: 0.3s, 0.3s, 0.3s;

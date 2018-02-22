@@ -17,6 +17,17 @@ function OnLootPicked(args) {
 			abilityIcon.SetHasClass("Hide", false);
 			abilityIcon.abilityname = v.content;
 			slotNameLabel.text = $.Localize("DOTA_Tooltip_ability_" + v.content);
+
+			var heroEntity = Players.GetPlayerHeroEntityIndex(Players.GetLocalPlayer());
+ 	
+			if (Entities.GetAbilityByName(heroEntity, v.content) > 0)
+			{
+				var miscIcon = slotIcon.FindChildTraverse("SlotMiscIcon");
+				miscIcon.SetHasClass("Hide", false);
+				miscIcon.SetImage("file://{images}/custom_game/levelup.png");
+
+				slotNameLabel.text = slotNameLabel.text + " (+1)";
+			}
 		}
 		if (v.lootType == 2) {
 			var itemIcon = slotIcon.FindChildTraverse("SlotItemIcon");
