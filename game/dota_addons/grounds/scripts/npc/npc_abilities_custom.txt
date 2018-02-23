@@ -3,6 +3,20 @@
 {
 	"Version"       "1"
 
+	"grounds_open_crate"
+	{
+	  "AbilityBehavior"       	"DOTA_ABILITY_BEHAVIOR_CHANNELLED | DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_HIDDEN"
+	  "BaseClass"           	"ability_lua"
+	  "ScriptFile" 				"grounds_abilities"
+	  "AbilityTextureName"      "riki_permanent_invisibility"
+
+	  "AbilityCastPoint"        "0.0"
+
+	  "AbilityManaCost"       "0"
+	  "AbilityGoldCost"       "0"
+	  "AbilityChannelTime"      "4.0"
+	}
+
 	"dota_ability_throw_coin"
 	{
 		"BaseClass"							"ability_datadriven"

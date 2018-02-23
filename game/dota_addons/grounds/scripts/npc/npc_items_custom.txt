@@ -192,7 +192,7 @@
 		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
 		"ItemPermanent"					"1"
 		"ItemInitialCharges"			"0"
-		"ItemKillable"					"0"
+		"ItemKillable"					"1"
 	}
 	//=================================================================================================================
 	// Bag of Gold

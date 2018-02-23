@@ -483,3 +483,72 @@ function COverthrowGameMode:OnPlayerLearnedAbility( keys)
 		PlayerStates[pID].bMaxedOut = true
 	end
 end
+
+function COverthrowGameMode:FilterExecuteOrder( filterTable )
+    local units = filterTable["units"]
+    local order_type = filterTable["order_type"]
+    local issuer = filterTable["issuer_player_id_const"]
+    local abilityIndex = filterTable["entindex_ability"]
+    local targetIndex = filterTable["entindex_target"]
+    local x = tonumber(filterTable["position_x"])
+    local y = tonumber(filterTable["position_y"])
+    local z = tonumber(filterTable["position_z"])
+    local point = Vector(x,y,z)
+    local queue = filterTable["queue"] == 1
+
+    local unit
+    local numUnits = 0
+    local numBuildings = 0
+    if units and units["0"] then
+        unit = EntIndexToHScript(units["0"])
+        if unit then
+            if unit.skip then
+                unit.skip = false
+                return true
+            end
+        end
+    end
+
+    if issuer ~= -1 then
+        unit._vLastOrderFilterTable = filterTable
+    end
+
+    if order_type == DOTA_UNIT_ORDER_RADAR or order_type == DOTA_UNIT_ORDER_GLYPH then return end
+
+    if order_type == DOTA_UNIT_ORDER_PICKUP_ITEM then
+    	local item = EntIndexToHScript(targetIndex):GetContainedItem()
+    	if item and string.match(item:GetName(), "item_loot_") then
+		    Timers:CreateTimer(function()
+		        local o = unit:GetAbsOrigin()
+		        if not IsValidEntity(unit) then return end
+		        if not IsValidEntity(item) then return end
+		        if unit._vLastOrderFilterTable ~= filterTable then return end
+		        if (o-item:GetAbsOrigin()):Length2D() < 20 then
+		            local ability = unit:FindAbilityByName("grounds_open_crate")
+		            if not ability then
+		            	ability = unit:AddAbility("grounds_open_crate")
+		            end
+		            ability:SetLevel(1)
+		            unit:CastAbilityNoTarget(ability, unit:GetPlayerOwnerID())
+		            ability.target = item
+		            return nil
+		        else
+		        	-- unit:MoveToNPC(item:GetContainer()) 
+		            ExecuteOrderFromTable({
+		                UnitIndex = unit:entindex(),
+		                OrderType = DOTA_UNIT_ORDER_MOVE_TO_POSITION,
+		                Position = item:GetAbsOrigin(),
+
+					 --    UnitIndex = unit:entindex(),
+					 --    OrderType = DOTA_UNIT_ORDER_ATTACK_TARGET,
+						-- TargetIndex = targetIndex
+		            })
+		            return 0.03
+		        end
+		    end)
+			return false
+    	end
+    end
+
+    return true
+end
