@@ -54,11 +54,15 @@ function OnLootPicked(args) {
 		}
 		
 		var option = parseInt(k);
+		var activate = (function () {
+			GameEvents.SendCustomGameEventToServer("grounds_claim", { "option" : option } );
+			$("#GroundsLootWindow").SetHasClass("WindowClosed", true);
+		});
 		slot.FindChildTraverse("SlotButton").SetPanelEvent("onactivate", function () {
-			(function () {
-				GameEvents.SendCustomGameEventToServer("grounds_claim", { "option" : option } );
-				$("#GroundsLootWindow").SetHasClass("WindowClosed", true);
-			})();
+			activate();
+		});	
+		slotIcon.SetPanelEvent("onactivate", function () {
+			activate();
 		});	
 	}));
 	$("#GroundsLootWindow").SetHasClass("WindowClosed", false);
