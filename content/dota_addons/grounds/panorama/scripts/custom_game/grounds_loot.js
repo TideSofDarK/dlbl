@@ -38,8 +38,8 @@ function OnLootPicked(args) {
 		if (v.lootType == 3) {
 			var miscIcon = slotIcon.FindChildTraverse("SlotMiscIcon");
 			miscIcon.SetHasClass("Hide", false);
-			miscIcon.SetImage("file://{images}/custom_game/" + v.content + ".png");
-			slotNameLabel.text = $.Localize(v.content.toUpperCase());
+			miscIcon.SetImage("file://{images}/custom_game/bonuses/" + v.quality + "/" + v.content + ".png");
+			slotNameLabel.text = $.Localize(v.content);
 		}	
 		if (v.lootType == 4) {
 			var heroIcon = $.CreatePanel( "Panel", slotIcon, "SlotHeroIcon" );

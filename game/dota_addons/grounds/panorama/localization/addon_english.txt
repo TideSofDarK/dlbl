@@ -15,6 +15,20 @@
 													-The fewer kills your team has, the better the item you will receive from a delivery.<br>
 													-Slay anyone who isn't on your team."
 
+	"gold" "Gold"
+	"xp" "XP"
+	"modifier_bonus_max_mana" "Bonus Mana"
+	"modifier_bonus_damage" "Bonus Damage"
+	"modifier_bonus_ms" "Bonus Movespeed"
+	"modifier_bonus_vision" "Bonus Vision"
+	"modifier_rune_haste" "Haste Rune"
+	"modifier_rune_doubledamage" "Damage Rune"
+	"modifier_true_sight" "True Sight"
+	"modifier_bonus_flying_vision" "Flying Vision"
+	"modifier_bonus_unobstructed_movement" "Flying"
+	"modifier_invulnerable" "Invulnerable"
+	"illusions" "Illusions"
+
 	"Chest"											"ITEM"
 	"ItemWillSpawn"									"IS ABOUT TO BE DELIVERED!"
 	"ItemHasSpawned"								"IS ON ITS WAY!"

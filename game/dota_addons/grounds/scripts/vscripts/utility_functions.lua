@@ -282,3 +282,133 @@ function CDOTA_BaseNPC:GetAllAbilities()
 
   return abilities
 end
+
+function CDOTA_BaseNPC_Hero:AddExperiencePercent( percent )
+  local expTable = {
+    0,
+    200,
+    600,
+    1080,
+    1680,
+    2300,
+    2940,
+    3600,
+    4280,
+    5080,
+    5900,
+    6740,
+    7640,
+    8865,
+    10115,
+    11390,
+    12690,
+    14015,
+    15415,
+    16905,
+    18405,
+    20155,
+    22155,
+    24405,
+    26905
+  }
+  local level = self:GetLevel()
+  local exp = self:GetCurrentXP()
+
+  local nextLevelExp = expTable[level+1]
+  local diff1 = (expTable[level+1] - expTable[level])
+  local diff2 = (expTable[level+2] - expTable[level+1])
+
+  local result = 0
+  if (exp - expTable[level]) > (diff1 * percent) then
+    result = ((percent - ((expTable[level+1] - exp) / diff1)) * diff2) + (expTable[level+1] - exp)
+  else
+    result = (diff1 * percent)
+  end
+  print("XP:", result)
+  self:AddExperience(result, DOTA_ModifyXP_Unspecified, false, true)
+
+  return result
+end
+
+function CreateIllusions(hTarget,nIllusions,flDuration,flIncomingDamage,flOutgoingDamage,flRadius)
+  local caster = hTarget
+  local ability = nil
+  local player = caster:GetPlayerOwnerID()
+  if not flRadius then flRadius = 50 end
+  local illusions = {}
+  local vRandomSpawnPos = {
+      Vector( flRadius, 0, 0 ),
+      Vector( 0, flRadius, 0 ),
+      Vector( -flRadius, 0, 0 ),
+      Vector( 0, -flRadius, 0 ),
+  }
+
+  for i=#vRandomSpawnPos, 2, -1 do
+    local j = RandomInt( 1, i )
+    vRandomSpawnPos[i], vRandomSpawnPos[j] = vRandomSpawnPos[j], vRandomSpawnPos[i]
+  end
+  for i =1, nIllusions do
+      if not vRandomSpawnPos or #vRandomSpawnPos == 0 then
+          vRandomSpawnPos[1] = RandomVector(flRadius)
+      end
+      local illusion = CreateUnitByName(hTarget:GetUnitName(),hTarget:GetAbsOrigin() +vRandomSpawnPos[1],true,caster,caster:GetOwner(),caster:GetTeamNumber())
+      table.remove(vRandomSpawnPos, 1)
+      illusion:MakeIllusion()
+      illusion:SetControllableByPlayer(player,true)
+      illusion:SetPlayerID(player)
+      illusion:SetHealth(hTarget:GetHealth())
+      illusion:SetMana(hTarget:GetMana())
+      illusion:AddNewModifier(caster, ability, "modifier_illusion", {duration = flDuration, outgoing_damage=flOutgoingDamage, incoming_damage = flIncomingDamage})
+
+      --make sure this unit actually has stats
+      if illusion.GetStrength then
+          --copy over all the stat modifiers from the original hero
+          for k,v in pairs(hTarget:FindAllModifiersByName("modifier_stats_tome")) do
+              local instance = illusion:AddNewModifier(illusion, v:GetAbility(), "modifier_stats_tome", {stat = v.stat})
+              instance:SetStackCount(v:GetStackCount())
+          end
+      end
+
+      local level = hTarget:GetLevel()
+      for i=1,level-1 do
+          illusion:HeroLevelUp(false)
+      end
+
+      for abilitySlot=0,23 do
+          local abilityTemp = caster:GetAbilityByIndex(abilitySlot)
+
+          if abilityTemp then
+              illusion:RemoveAbility(abilityTemp:GetAbilityName())
+          end
+      end
+
+      illusion:SetAbilityPoints(0)
+      for abilitySlot=0,23 do
+          local abilityTemp = hTarget:GetAbilityByIndex(abilitySlot)
+
+          if abilityTemp then
+              illusion:AddAbility(abilityTemp:GetAbilityName())
+              local abilityLevel = abilityTemp:GetLevel()
+              if abilityLevel > 0 then
+                  local abilityName = abilityTemp:GetAbilityName()
+                  local illusionAbility = illusion:FindAbilityByName(abilityName)
+                  if illusionAbility then
+                      illusionAbility:SetLevel(abilityLevel)
+                  end
+              end
+          end
+      end
+
+      for itemSlot=0,8 do
+          local item = hTarget:GetItemInSlot(itemSlot)
+          if item then
+              local itemName = item:GetName()
+              local newItem = CreateItem(itemName, illusion,illusion)
+              illusion:AddItem(newItem)
+          end
+      end
+      table.insert(illusions,illusion)
+  end
+  ResolveNPCPositions(hTarget:GetAbsOrigin(),flRadius*1.05)
+  return illusions
+end

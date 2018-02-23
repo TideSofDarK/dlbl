@@ -15,6 +15,38 @@
 	background-image: url("file://{images}/custom_game/ap.png");
 	background-image: url("file://{images}/custom_game/gold.png");
 	background-image: url("file://{images}/custom_game/levelup.png");
+
+	background-image: url("file://{images}/custom_game/bonuses/Common/gold.png");
+	background-image: url("file://{images}/custom_game/bonuses/Common/xp.png");
+	background-image: url("file://{images}/custom_game/bonuses/Common/modifier_bonus_max_mana.png");
+	background-image: url("file://{images}/custom_game/bonuses/Common/modifier_bonus_damage.png");
+	background-image: url("file://{images}/custom_game/bonuses/Common/modifier_bonus_ms.png");
+	background-image: url("file://{images}/custom_game/bonuses/Common/modifier_bonus_vision.png");
+	background-image: url("file://{images}/custom_game/bonuses/Common/modifier_rune_haste.png");
+	background-image: url("file://{images}/custom_game/bonuses/Common/modifier_rune_doubledamage.png");
+	background-image: url("file://{images}/custom_game/bonuses/Common/illusions.png");
+
+	background-image: url("file://{images}/custom_game/bonuses/Uncommon/gold.png");
+	background-image: url("file://{images}/custom_game/bonuses/Uncommon/xp.png");
+	background-image: url("file://{images}/custom_game/bonuses/Uncommon/modifier_bonus_max_mana.png");
+	background-image: url("file://{images}/custom_game/bonuses/Uncommon/modifier_bonus_damage.png");
+	background-image: url("file://{images}/custom_game/bonuses/Uncommon/modifier_bonus_ms.png");
+	background-image: url("file://{images}/custom_game/bonuses/Uncommon/modifier_bonus_vision.png");
+	background-image: url("file://{images}/custom_game/bonuses/Uncommon/modifier_invulnerable.png");
+	background-image: url("file://{images}/custom_game/bonuses/Uncommon/modifier_rune_haste.png");
+	background-image: url("file://{images}/custom_game/bonuses/Uncommon/modifier_rune_doubledamage.png");
+
+	background-image: url("file://{images}/custom_game/bonuses/Rare/gold.png");
+	background-image: url("file://{images}/custom_game/bonuses/Rare/xp.png");
+	background-image: url("file://{images}/custom_game/bonuses/Rare/modifier_bonus_max_mana.png");
+	background-image: url("file://{images}/custom_game/bonuses/Rare/modifier_bonus_damage.png");
+	background-image: url("file://{images}/custom_game/bonuses/Rare/modifier_bonus_ms.png");
+	background-image: url("file://{images}/custom_game/bonuses/Rare/modifier_invulnerable.png");
+	background-image: url("file://{images}/custom_game/bonuses/Rare/modifier_true_sight.png");
+	background-image: url("file://{images}/custom_game/bonuses/Rare/modifier_bonus_flying_vision.png");
+	background-image: url("file://{images}/custom_game/bonuses/Rare/modifier_bonus_unobstructed_movement.png");
+	background-image: url("file://{images}/custom_game/bonuses/Rare/modifier_rune_haste.png");
+	background-image: url("file://{images}/custom_game/bonuses/Rare/modifier_rune_doubledamage.png");
 	*/
 
 	transition-property: blur, transform, opacity, width, height, wash-color, pre-transform-scale2d, saturation;

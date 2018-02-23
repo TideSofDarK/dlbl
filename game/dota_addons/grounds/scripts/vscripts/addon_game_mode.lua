@@ -23,6 +23,7 @@ require( "utility_functions" )
 require( "popups" )
 require( "timers" )
 require( "grounds" )
+require( "grounds_modifiers" )
 
 ---------------------------------------------------------------------------
 -- Precache
@@ -265,7 +266,7 @@ function COverthrowGameMode:Test()
 		if playerID ~= nil and playerID ~= -1 then
 			local hero = cmdPlayer:GetAssignedHero()
 
-			local item = CreateItem("item_loot_abilities", hero, spawnedUnit)
+			local item = CreateItem("item_loot_bonuses", hero, spawnedUnit)
 			CreateItemOnPositionSync(hero:GetAbsOrigin(), item)
 			item:LaunchLoot(false, 100.0, 0.5, hero:GetAbsOrigin())
 		end

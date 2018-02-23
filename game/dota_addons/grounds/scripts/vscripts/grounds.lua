@@ -191,7 +191,7 @@ function OnSupplyCratePicked( owner, forcedRarity )
 	local contents = GetRandomElements(LootTable.Items[quality], 3, nil, true)
 
 	for k,v in pairs(contents) do
-		table.insert(loot, { lootType = 2, content = v })
+		table.insert(loot, { lootType = 2, content = v, quality = quality })
 	end
 
 	owner.currentLoot = loot
@@ -203,15 +203,23 @@ function OnBonusCratePicked( owner, forcedRarity )
 
 	local quality = forcedRarity or GetRandomQuality()
 
-	local allConents = LootTable.Bonuses[quality]
+	local allContents = LootTable.Bonuses[quality]
 	for k,v in pairs(LootTable.Bonuses.Unclassified) do
-		allConents[k] = v
+		allContents[k] = v
 	end
 
-	local contents = GetRandomElements(LootTable.Items[quality], 3, nil, true)
+	for k,v in pairs(allContents) do
+		if type(v) == "table" and v.Unique then
+			if owner:HasModifier(k) then
+				allContents[k] = nil
+			end
+		end
+	end
+
+	local contents = GetRandomElements(LootTable.Bonuses[quality], 3, nil, true)
 
 	for k,v in pairs(contents) do
-		table.insert(loot, { lootType = 3, content = v })
+		table.insert(loot, { lootType = 3, content = v, value = allContents[v], quality = quality })
 	end
 
 	owner.currentLoot = loot
@@ -314,6 +322,7 @@ function COverthrowGameMode:OnPlayerClaimedReward( keys )
 				-- Level up owned ability
 				local ab = hero:FindAbilityByName(loot.content)
 				ab:UpgradeAbility(true)
+				PopupHealthTome(hero, 1)
 			else
 				-- Find slot for active ability
 				if not string.match(AbilitiesKV[loot.content].AbilityBehavior, "DOTA_ABILITY_BEHAVIOR_PASSIVE") then
@@ -374,57 +383,41 @@ function COverthrowGameMode:OnPlayerClaimedReward( keys )
 			hero:EmitSound("DOTA_Item.Hand_Of_Midas")
 			if loot.content == "xp" then
 				if hero:GetLevel() < 25 then
-					local expTable = {
-						0,
-						200,
-						600,
-						1080,
-						1680,
-						2300,
-						2940,
-						3600,
-						4280,
-						5080,
-						5900,
-						6740,
-						7640,
-						8865,
-						10115,
-						11390,
-						12690,
-						14015,
-						15415,
-						16905,
-						18405,
-						20155,
-						22155,
-						24405,
-						26905
-					}
-					local level = hero:GetLevel()
-					local exp = hero:GetCurrentXP()
-					
-					local nextLevelExp = expTable[level+1]
-					local diff1 = (expTable[level+1] - expTable[level])
-					local diff2 = (expTable[level+2] - expTable[level+1])
-					
-					local result = 0
-					if (exp - expTable[level]) > (diff1 / 2) then
-						result = ((0.5 - ((expTable[level+1] - exp) / diff1)) * diff2) + (expTable[level+1] - exp)
-					else
-						result = (diff1 / 2)
-					end
-					print("XP:", result)
-					hero:AddExperience(result, DOTA_ModifyXP_Unspecified, false, true)
-					PopupExperience(hero, result)
+					PopupExperience(hero, hero:AddExperiencePercent( tonumber(loot.value) ))
 				end
-			elseif loot.content == "ap" then
-				hero:SetAbilityPoints(hero:GetAbilityPoints() + 1)
-				PopupHealthTome(hero, 1)
-			else
-				local gold = 400 + math.random(0,100)
+			elseif loot.content == "gold" then
+				local gold = tonumber(loot.value)
 				PlayerResource:ModifyGold(pID, gold, true, DOTA_ModifyGold_Unspecified)
 				PopupGoldGain(hero, gold)
+			elseif loot.content == "illusions" then
+				CreateIllusions(hero,2,120,200,50,128)
+			elseif string.match(loot.content, "modifier_") then
+				local modifierTable = {}
+				local unique = false
+				local stacks
+				if type(loot.value) == 'table' then
+					if loot.value.Duration then
+						modifierTable.duration = tonumber(loot.value.Duration)
+					end
+					if loot.value.Unique then
+						unique = true
+					end					
+				else
+					stacks = tonumber(loot.value)
+				end
+				
+				if unique and hero:HasModifier(loot.content) then
+				else
+					local modifier = hero:FindModifierByName(loot.content)
+					if not modifier then
+						modifier = hero:AddNewModifier(hero, nil, loot.content, modifierTable)
+					elseif modifierTable.duration then
+						modifier:SetDuration(modifierTable.duration, true)
+					end
+					if stacks then
+						modifier:SetStackCount(modifier:GetStackCount() + stacks)
+					end
+				end
 			end
 		elseif loot.lootType == 4 then
 			local newHero = PlayerResource:ReplaceHeroWith(pID, loot.content, 0, 0)
