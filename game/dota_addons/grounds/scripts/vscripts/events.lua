@@ -218,6 +218,8 @@ end
 function COverthrowGameMode:OnItemPickUp( event )
 	local item = EntIndexToHScript( event.ItemEntityIndex )
 	local owner = EntIndexToHScript( event.HeroEntityIndex )
+	local pID = owner:GetPlayerOwnerID()
+
 	r = 300
 	--r = RandomInt(200, 400)
 	if event.itemname == "item_bag_of_gold" then
@@ -230,19 +232,9 @@ function COverthrowGameMode:OnItemPickUp( event )
 		DoEntFire( "item_spawn_particle_" .. self.itemSpawnIndex, "Stop", "0", 0, self, self )
 		COverthrowGameMode:SpecialItemAdd( event )
 		UTIL_Remove( item ) -- otherwise it pollutes the player inventory
-	elseif event.itemname == "item_loot_abilities" then
-		OnAbilityCratePicked( owner )
-		UTIL_Remove( item )
-	elseif event.itemname == "item_loot_supply" then
-		OnSupplyCratePicked( owner )
-		UTIL_Remove( item )
-	elseif event.itemname == "item_loot_bonuses" then
-		OnBonusCratePicked( owner )
-		UTIL_Remove( item )
-	elseif event.itemname == "item_loot_starting" then
-		OnStartingCratePicked( owner )
-		UTIL_Remove( item )
 	end
+
+	OnGroundsItemPickUp(event)
 end
 
 

@@ -213,6 +213,7 @@ function COverthrowGameMode:InitGameMode()
 	ListenToGameEvent( "dota_team_kill_credit", Dynamic_Wrap( COverthrowGameMode, 'OnTeamKillCredit' ), self )
 	ListenToGameEvent( "entity_killed", Dynamic_Wrap( COverthrowGameMode, 'OnEntityKilled' ), self )
 	ListenToGameEvent( "dota_item_picked_up", Dynamic_Wrap( COverthrowGameMode, "OnItemPickUp"), self )
+	ListenToGameEvent('dota_player_learned_ability', Dynamic_Wrap(COverthrowGameMode, 'OnPlayerLearnedAbility'), self)
 	ListenToGameEvent( "dota_npc_goal_reached", Dynamic_Wrap( COverthrowGameMode, "OnNpcGoalReached" ), self )
 
 	CustomGameEventManager:RegisterListener("grounds_claim", Dynamic_Wrap( COverthrowGameMode, "OnPlayerClaimedReward" ))
