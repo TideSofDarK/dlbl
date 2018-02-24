@@ -178,9 +178,9 @@ function COverthrowGameMode:InitGameMode()
 	GameRules:SetCustomGameTeamMaxPlayers( DOTA_TEAM_CUSTOM_1, 1 )
 	GameRules:SetCustomGameTeamMaxPlayers( DOTA_TEAM_CUSTOM_2, 1 )
 
-	self.m_GoldDropPercent = 25
-	self.m_GoldRadiusMin = 250
-	self.m_GoldRadiusMax = 3100
+	self.m_GoldDropPercent = 20
+	self.m_GoldRadiusMin = 700
+	self.m_GoldRadiusMax = 1600
 
 	-- Show the ending scoreboard immediately
 	GameRules:SetCustomGameEndDelay( 0 )
