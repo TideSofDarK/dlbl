@@ -516,14 +516,15 @@ function COverthrowGameMode:FilterExecuteOrder( filterTable )
     if order_type == DOTA_UNIT_ORDER_RADAR or order_type == DOTA_UNIT_ORDER_GLYPH then return end
 
     if order_type == DOTA_UNIT_ORDER_PICKUP_ITEM then
-    	local item = EntIndexToHScript(targetIndex):GetContainedItem()
+    	local container = EntIndexToHScript(targetIndex)
+    	local item = container:GetContainedItem()
     	if item and string.match(item:GetName(), "item_loot_") then
 		    Timers:CreateTimer(function()
 		        local o = unit:GetAbsOrigin()
 		        if not IsValidEntity(unit) then return end
-		        if not IsValidEntity(item) then return end
+		        if not IsValidEntity(container) or not IsValidEntity(item) then return end
 		        if unit._vLastOrderFilterTable ~= filterTable then return end
-		        if (o-item:GetAbsOrigin()):Length2D() < 20 then
+		        if (o-container:GetAbsOrigin()):Length2D() < 20 then
 		            local ability = unit:FindAbilityByName("grounds_open_crate")
 		            if not ability then
 		            	ability = unit:AddAbility("grounds_open_crate")
@@ -537,7 +538,7 @@ function COverthrowGameMode:FilterExecuteOrder( filterTable )
 		            ExecuteOrderFromTable({
 		                UnitIndex = unit:entindex(),
 		                OrderType = DOTA_UNIT_ORDER_MOVE_TO_POSITION,
-		                Position = item:GetAbsOrigin(),
+		                Position = container:GetAbsOrigin(),
 
 					 --    UnitIndex = unit:entindex(),
 					 --    OrderType = DOTA_UNIT_ORDER_ATTACK_TARGET,

@@ -41,7 +41,7 @@ function COverthrowGameMode:SpawnLootEntity( spawnPoint )
 	AddFOWViewer(7, point, 256, 5.0, false)
 
 	newItem:LaunchLootInitialHeight( false, 0, 500, 0.75, point )
-	newItem:SetContextThink( "KillLoot", function() return self:KillLoot( newItem, drop ) end, 20 )
+	newItem:SetContextThink( "KillLoot", function() return self:KillLoot( newItem, drop ) end, 30 )
 end
 
 
