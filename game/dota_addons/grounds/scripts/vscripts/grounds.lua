@@ -400,7 +400,8 @@ function COverthrowGameMode:OnPlayerClaimedReward( keys )
 			hero:EmitSound("DOTA_Item.Hand_Of_Midas")
 			if loot.content == "xp" then
 				if hero:GetLevel() < 25 then
-					PopupExperience(hero, hero:AddExperiencePercent( tonumber(loot.value) / 100 ))
+					local number, _ = string.gsub(loot.value, '%W', '')	
+					PopupExperience(hero, hero:AddExperiencePercent( tonumber(number) / 100 ))
 				end
 			elseif loot.content == "gold" then
 				local gold = tonumber(loot.value)
