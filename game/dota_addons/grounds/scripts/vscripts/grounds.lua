@@ -538,7 +538,7 @@ function COverthrowGameMode:FilterExecuteOrder( filterTable )
 		        if not IsValidEntity(unit) then return end
 		        if not IsValidEntity(container) or not IsValidEntity(item) then return end
 		        if unit._vLastOrderFilterTable ~= filterTable then return end
-		        if (o-container:GetAbsOrigin()):Length2D() < 36 then
+		        if (o-container:GetAbsOrigin()):Length2D() < 64 then
 		        	if not unit:IsRealHero() then
 		        		return nil
 		        	end
