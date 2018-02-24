@@ -1,6 +1,378 @@
 "DOTAAbilities"
 {
 	//=================================================================================================================
+	// Book of Strength
+	//=================================================================================================================
+	"item_book_of_strength"
+	{
+		"BaseClass"                 "item_datadriven"
+		"ID"              "1505"
+		"AbilityBehavior"       "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"Model"							"models/gameplay/attrib_tome_str.vmdl"
+		"skin" "1"
+		"Effect"            "particles/generic_gameplay/dropped_item.vpcf"
+		"AbilityTextureName"      "item_book_of_strength"
+
+		"ItemCost"            "225"
+		"ItemShopTags"          "consumable"
+		"ItemQuality"           "consumable"
+		"ItemAliases"         "book"
+		"ItemInitialCharges" "1"
+		"ItemPurchasable"				"0"
+
+		"ItemStockMax" "10" 
+		"ItemStockTime" "45"
+		"ItemStockInitial" "5"
+
+		"ItemStackable"         "1"
+		"ItemPermanent"         "0"
+
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"			"FIELD_INTEGER"
+				"bonus_strength"		"3"
+			}
+		}
+
+		"OnSpellStart"
+		{
+			"ApplyModifier"
+			{
+				"ModifierName"	"modifier_book_of_strength_buff"
+				"Target" 		"CASTER"
+			}
+			"FireSound"
+			{
+				"Target" "CASTER"
+				"EffectName" "Item.TomeOfKnowledge"
+			}
+			"SpendCharge"
+			{}
+		}
+
+		"Modifiers"
+		{
+			"modifier_book_of_strength_buff"
+			{
+				"Passive"			"0"
+				"IsHidden"			"1"
+				"IsDebuff"			"0"
+
+				"Attributes"		"MODIFIER_ATTRIBUTE_MULTIPLE | MODIFIER_ATTRIBUTE_PERMANENT"
+		
+				"Properties"
+				{
+					"MODIFIER_PROPERTY_STATS_STRENGTH_BONUS" "3"
+				}
+			}
+		}
+	}
+	//=================================================================================================================
+	// Book of Intelligence
+	//=================================================================================================================
+	"item_book_of_intelligence"
+	{
+		"BaseClass"                 "item_datadriven"
+		"ID"              "1504"
+		"AbilityBehavior"       "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"Model"							"models/gameplay/attrib_tome_int.vmdl"
+		"Effect"            "particles/generic_gameplay/dropped_item.vpcf"
+		"AbilityTextureName"      "item_book_of_intelligence"
+
+		"ItemCost"            "225"
+		"ItemShopTags"          "consumable"
+		"ItemQuality"           "consumable"
+		"ItemAliases"         "book"
+		"ItemInitialCharges" "1"
+		"ItemPurchasable"				"0"
+
+		"ItemStockMax" "10" 
+		"ItemStockTime" "45"
+		"ItemStockInitial" "5"
+
+		"ItemStackable"         "1"
+		"ItemPermanent"         "0"
+
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"			"FIELD_INTEGER"
+				"bonus_intellect"		"3"
+			}
+		}
+
+		"OnSpellStart"
+		{
+			"ApplyModifier"
+			{
+				"ModifierName"	"modifier_book_of_intelligence_buff"
+				"Target" 		"CASTER"
+			}
+			"FireSound"
+			{
+				"Target" "CASTER"
+				"EffectName" "Item.TomeOfKnowledge"
+			}
+			"SpendCharge"
+			{}
+		}
+
+		"Modifiers"
+		{
+			"modifier_book_of_intelligence_buff"
+			{
+				"Passive"			"0"
+				"IsHidden"			"1"
+				"IsDebuff"			"0"
+
+				"Attributes"		"MODIFIER_ATTRIBUTE_MULTIPLE | MODIFIER_ATTRIBUTE_PERMANENT"
+		
+				"Properties"
+				{
+					"MODIFIER_PROPERTY_STATS_INTELLECT_BONUS" "%bonus_intellect"
+				}
+			}
+		}
+	}
+	//=================================================================================================================
+	// Book of Agility
+	//=================================================================================================================
+	"item_book_of_agility"
+	{
+		"BaseClass"                 "item_datadriven"
+		"ID"              "1503"
+		"AbilityBehavior"       "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"Model"							"models/gameplay/attrib_tome_agi.vmdl"
+		"skin" "2"
+		"Effect"            "particles/generic_gameplay/dropped_item.vpcf"
+		"AbilityTextureName"      "item_book_of_agility"
+
+		"ItemCost"            "225"
+		"ItemShopTags"          "consumable"
+		"ItemQuality"           "consumable"
+		"ItemAliases"         "book"
+		"ItemInitialCharges" "1"
+		"ItemPurchasable"				"0"
+
+		"ItemStockMax" "10" 
+		"ItemStockTime" "45"
+		"ItemStockInitial" "5"
+
+		"ItemStackable"         "1"
+		"ItemPermanent"         "0"
+
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"			"FIELD_INTEGER"
+				"bonus_agility"		"3"
+			}
+		}
+
+		"OnSpellStart"
+		{
+			"ApplyModifier"
+			{
+				"ModifierName"	"modifier_book_of_agility_buff"
+				"Target" 		"CASTER"
+			}
+			"FireSound"
+			{
+				"Target" "CASTER"
+				"EffectName" "Item.TomeOfKnowledge"
+			}
+			"SpendCharge"
+			{}
+		}
+
+		"Modifiers"
+		{
+			"modifier_book_of_agility_buff"
+			{
+				"Passive"			"0"
+				"IsHidden"			"1"
+				"IsDebuff"			"0"
+
+				"Attributes"		"MODIFIER_ATTRIBUTE_MULTIPLE | MODIFIER_ATTRIBUTE_PERMANENT"
+		
+				"Properties"
+				{
+					"MODIFIER_PROPERTY_STATS_AGILITY_BONUS" "%bonus_agility"
+				}
+			}
+		}
+	}
+	//=================================================================================================================
+	// Greater Clarity
+	//=================================================================================================================
+	"item_greater_clarity"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE | DOTA_ABILITY_BEHAVIOR_DONT_RESUME_ATTACK"
+		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
+		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO"
+		"Model"							"models/props_gameplay/salve_blue.vmdl"
+		"BaseClass"						"item_datadriven"
+		"AbilityTextureName"			"item_greater_clarity"
+		"ItemKillable"					"1"
+
+		// Stats
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastRange"				"100"
+		"AbilityCastPoint"				"0.0"
+		
+		// Item Info
+		//-------------------------------------------------------------------------------------------------------------
+		"ItemCost"						"90"
+		"ItemPurchasable"				"1"
+		"ItemShopTags"					"consumable"
+		"ItemQuality"					"consumable"
+		"ItemStackable"					"1"
+		"ItemShareability"				"ITEM_FULLY_SHAREABLE_STACKING"
+		"ItemPermanent"					"0"
+		"ItemInitialCharges"			"1"
+
+		"OnSpellStart"
+		{
+			"ApplyModifier"
+			{
+				"Target" "CURSOR_TARGET"
+				"ModifierName" "modifier_item_greater_clarity"
+			}
+			"FireSound"
+			{
+				"Target" "UNIT"
+				"EffectName" "DOTA_Item.ClarityPotion.Activate"
+			}
+			"SpendCharge"
+			{}
+		}
+
+		"Modifiers"
+		{
+			"modifier_item_greater_clarity"
+			{
+				"TextureName" "item_greater_clarity"
+				"EffectName" "particles/items_fx/healing_clarity.vpcf"
+				"EffectAttachType" "follow_origin"
+				"Duration" "%buff_duration"
+				"Properties"
+				{
+					"MODIFIER_PROPERTY_MANA_REGEN_CONSTANT" "%mana_per_tick"
+				}
+			}
+		}
+
+		// Special	
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"buff_duration"			"10"
+			}
+			"02"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"total_mana"			"150"
+			}
+			"03"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"mana_per_tick"			"15"  // %total_mana / %buff_duration
+			}
+		}
+	}
+	//=================================================================================================================
+	// Greater Salve
+	//=================================================================================================================
+	"item_greater_salve"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE | DOTA_ABILITY_BEHAVIOR_DONT_RESUME_ATTACK"
+		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
+		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO"
+		"Model"							"models/props_gameplay/salve_red.vmdl"
+		"BaseClass"						"item_datadriven"
+		"AbilityTextureName"			"item_greater_salve"
+		"ItemKillable"					"1"
+
+		// Stats
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastRange"				"100"
+		"AbilityCastPoint"				"0.0"
+		
+		// Item Info
+		//-------------------------------------------------------------------------------------------------------------
+		"ItemCost"						"275"
+		"ItemPurchasable"				"1"
+		"ItemShopTags"					"consumable"
+		"ItemQuality"					"consumable"
+		"ItemStackable"					"1"
+		"ItemShareability"				"ITEM_FULLY_SHAREABLE_STACKING"
+		"ItemPermanent"					"0"
+		"ItemInitialCharges"			"1"
+
+		"OnSpellStart"
+		{
+			"ApplyModifier"
+			{
+				"Target" "CURSOR_TARGET"
+				"ModifierName" "modifier_item_greater_salve"
+			}
+			"FireSound"
+			{
+				"Target" "UNIT"
+				"EffectName" "DOTA_Item.HealingSalve.Activate"
+			}
+			"SpendCharge"
+			{}
+		}
+
+		"Modifiers"
+		{
+			"modifier_item_greater_salve"
+			{
+				"TextureName" "item_greater_salve"
+				"EffectName" "particles/items_fx/healing_flask.vpcf"
+				"EffectAttachType" "follow_origin"
+				"Duration" "%buff_duration"
+				"Properties"
+				{
+					"MODIFIER_PROPERTY_HEALTH_REGEN_CONSTANT" "%hp_per_tick"
+				}
+			}
+		}
+
+		// Special	
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"buff_duration"			"10"
+			}
+			"02"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"total_hp"				"1000"
+			}
+			"03"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"hp_per_tick"			"100"  // %total_mana / %buff_duration
+			}
+		}
+	}
+	//=================================================================================================================
 	// Passive Gold
 	//=================================================================================================================
 	"item_passive_gold"

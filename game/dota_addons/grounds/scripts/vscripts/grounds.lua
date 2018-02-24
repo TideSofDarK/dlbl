@@ -188,10 +188,25 @@ function OnSupplyCratePicked( owner, forcedRarity )
 
 	local quality = forcedRarity or GetRandomQuality()
 
-	local contents = GetRandomElements(LootTable.Items[quality], 3, nil, true)
+	local allContents = {}
+	local uids = {}
+	for k,v in pairs(LootTable.Items[quality]) do
+		if type(v) == "table" and v.UID then
+			uids[v.UID] = uids[v.UID] or {}
+			table.insert(uids[v.UID], k)
+		else
+			table.insert(allContents, k)
+		end
+	end
+
+	for k,v in pairs(uids) do
+		table.insert(allContents, GetRandomElement(v))
+	end
+
+	local contents = GetRandomElements(allContents, 3, nil)
 
 	for k,v in pairs(contents) do
-		table.insert(loot, { lootType = 2, content = v, quality = quality })
+		table.insert(loot, { lootType = 2, content = v, value = LootTable.Items[quality][v], quality = quality })
 	end
 
 	owner.currentLoot = loot
@@ -295,12 +310,14 @@ function OnStartingCratePicked( owner )
 		end
 
 	elseif not PlayerStates[pID].bStartingAbilityPicked then
-		PlayerStates[pID].bStartingAbilityPicked = true
+		-- PlayerStates[pID].bStartingAbilityPicked = true
 
-		local abilities = GetRandomElements(HeroAbilities[owner:GetUnitName()], 3)
-		for k,v in pairs(abilities) do
-			table.insert(loot, { lootType = 1, content = v })
-		end
+		-- local abilities = GetRandomElements(HeroAbilities[owner:GetUnitName()], 3)
+		-- for k,v in pairs(abilities) do
+		-- 	table.insert(loot, { lootType = 1, content = v })
+		-- end
+		OnAbilityCratePicked( owner )
+		return
 	end
 
 	owner.currentLoot = loot
@@ -372,7 +389,7 @@ function COverthrowGameMode:OnPlayerClaimedReward( keys )
 				end
 			end
 		elseif loot.lootType == 2 then
-			hero:AddItemByName(loot.content)
+			hero:AddItem(CreateItem(loot.content, hero, hero))
 			local overthrow_item_drop =
 			{
 				hero_id = hero:GetClassname(),
@@ -383,7 +400,7 @@ function COverthrowGameMode:OnPlayerClaimedReward( keys )
 			hero:EmitSound("DOTA_Item.Hand_Of_Midas")
 			if loot.content == "xp" then
 				if hero:GetLevel() < 25 then
-					PopupExperience(hero, hero:AddExperiencePercent( tonumber(loot.value) ))
+					PopupExperience(hero, hero:AddExperiencePercent( tonumber(loot.value) / 100 ))
 				end
 			elseif loot.content == "gold" then
 				local gold = tonumber(loot.value)
@@ -521,14 +538,26 @@ function COverthrowGameMode:FilterExecuteOrder( filterTable )
 		        if not IsValidEntity(unit) then return end
 		        if not IsValidEntity(container) or not IsValidEntity(item) then return end
 		        if unit._vLastOrderFilterTable ~= filterTable then return end
-		        if (o-container:GetAbsOrigin()):Length2D() < 20 then
-		            local ability = unit:FindAbilityByName("grounds_open_crate")
-		            if not ability then
-		            	ability = unit:AddAbility("grounds_open_crate")
-		            end
-		            ability:SetLevel(1)
-		            unit:CastAbilityNoTarget(ability, unit:GetPlayerOwnerID())
-		            ability.target = item
+		        if (o-container:GetAbsOrigin()):Length2D() < 36 then
+		        	if not unit:IsRealHero() then
+		        		return nil
+		        	end
+		        	-- Check if player has selected a hero
+		        	if not PlayerStates[unit:GetPlayerOwnerID()].bHeroPicked and item:GetName() ~= "item_loot_starting" then
+		        		return nil
+		        	end
+		        	-- Check if player has crate opened
+		        	if not unit.currentLoot then
+			            local ability = unit:FindAbilityByName("grounds_open_crate")
+			            if not ability then
+			            	ability = unit:AddAbility("grounds_open_crate")
+			            end
+			            ability:SetLevel(1)
+			            unit:CastAbilityNoTarget(ability, unit:GetPlayerOwnerID())
+			            ability.target = item
+			        else
+			        	unit:EmitSound("General.InvalidTarget_Invulnerable")
+			        end
 		            return nil
 		        else
 		        	-- unit:MoveToNPC(item:GetContainer()) 
