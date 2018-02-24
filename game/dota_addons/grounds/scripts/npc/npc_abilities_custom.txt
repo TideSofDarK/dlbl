@@ -14,7 +14,7 @@
 
 	  "AbilityManaCost"       "0"
 	  "AbilityGoldCost"       "0"
-	  "AbilityChannelTime"      "2.0"
+	  "AbilityChannelTime"      "0.5"
 	}
 
 	"dota_ability_throw_coin"
