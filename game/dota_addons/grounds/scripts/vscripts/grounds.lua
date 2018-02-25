@@ -70,6 +70,122 @@ for i=0,DOTA_MAX_PLAYERS do
 	end)
 end
 
+function ShrinkingCricle()
+	local idleTime = 30
+	local shrinkingTime = 30
+	local rounds = 3
+
+	local function CreateStaticCircle(origin, radius, time, callback)
+		local dummy = CreateUnitByName("npc_grounds_circle_dummy", origin, false, nil, nil, DOTA_TEAM_NEUTRALS)
+		dummy:SetAbsOrigin(GetGroundPosition(origin, dummy))
+
+		Timers:CreateTimer(function (  )
+			if not IsValidEntity(dummy) then
+			else
+				AddFOWViewer(2, origin, 256, 0.5, false)
+				return 0.5
+			end
+		end)
+
+		local rangeParticle = ParticleManager:CreateParticle("particles/grounds_circlev2.vpcf", PATTACH_ABSORIGIN, dummy)
+		ParticleManager:SetParticleControlEnt(rangeParticle, 0, dummy, PATTACH_ABSORIGIN_FOLLOW, "attach_origin", dummy:GetAbsOrigin(), true)
+		ParticleManager:SetParticleControl(rangeParticle, 1, Vector(radius, 1, 1))
+		-- ParticleManager:SetParticleControl(rangeParticle, 4, Vector(255, 255, 255))
+
+		Timers:CreateTimer(time, function (  )
+			ParticleManager:DestroyParticle(rangeParticle, true)
+			UTIL_Remove(dummy)
+
+			callback()
+		end)
+
+		return rangeParticle
+	end
+
+	function CreateShrinkingCircle(origin, radius, targetRadius, time, callback)
+		local dummy = CreateUnitByName("npc_grounds_circle_dummy", origin, false, nil, nil, DOTA_TEAM_NEUTRALS)
+		dummy:SetAbsOrigin(GetGroundPosition(origin, dummy))
+		
+		Timers:CreateTimer(function (  )
+			if not IsValidEntity(dummy) then
+			else
+				AddFOWViewer(2, origin, 256, 0.5, false)
+				return 0.5
+			end
+		end)
+
+		local rangeParticle = ParticleManager:CreateParticle("particles/grounds_circlev2_shrinking.vpcf", PATTACH_ABSORIGIN, dummy)
+		ParticleManager:SetParticleControlEnt(rangeParticle, 0, dummy, PATTACH_ABSORIGIN_FOLLOW, "attach_origin", dummy:GetAbsOrigin(), true)
+		ParticleManager:SetParticleControl(rangeParticle, 1, Vector(radius, 1, targetRadius / -time))
+		-- ParticleManager:SetParticleControl(rangeParticle, 4, Vector(0, 153, 204))
+		
+		Timers:CreateTimer(time, function (  )
+			ParticleManager:DestroyParticle(rangeParticle, true)
+			UTIL_Remove(dummy)
+
+			callback()
+		end)
+
+		return rangeParticle
+	end
+
+	local function GetRandomWorldPoint(percent, centerX, centerY, radius)
+		local centerX = centerX or math.max(GetWorldMaxX(), GetWorldMinX()) + (math.abs(GetWorldMaxX()) + math.abs(GetWorldMinX())) / -2
+		local centerY = centerY or math.max(GetWorldMaxY(), GetWorldMinY()) + (math.abs(GetWorldMaxY()) + math.abs(GetWorldMinY())) / -2
+
+		local radius = radius or (GetWorldMaxX() * percent)
+
+		return RandomPointInsideCircle(centerX, centerY, radius, 128)
+	end
+
+	local pos = Vector(0,0,0)
+	local radius = GetWorldMaxX()/2
+	local currentRadius = radius
+	local count = 1
+	local function ShrinkingRoutine()
+		local isOver = count > rounds
+		if isOver then
+			idleTime = 99999
+		end
+		currentRadius = radius
+		CreateStaticCircle(pos, radius, idleTime, function ()
+			if isOver then
+				return
+			end
+			currentRadius = radius
+			radius = radius / 2
+			pos = RandomPointInsideCircle(pos.x, pos.y, radius, 0)
+			local t = Timers:CreateTimer(function ()
+				currentRadius = currentRadius - (radius / shrinkingTime)
+				return 1.0
+			end)
+			CreateShrinkingCircle(pos, radius * 2, radius, shrinkingTime, function ()
+				count = count + 1
+				Timers:RemoveTimer(t)
+				ShrinkingRoutine()
+			end)
+		end)
+	end
+
+	ShrinkingRoutine()
+
+	Timers:CreateTimer(function ()
+		for k,v in pairs(HeroList:GetAllHeroes()) do
+			-- DebugDrawSphere(pos, Vector(255,0,0), currentRadius, currentRadius, true, 1.0)
+			if not IsPointInsideCircle(pos, currentRadius, v:GetAbsOrigin()) then
+				local damage_table = {
+					victim = v,
+					attacker = v,
+					damage = v:GetMaxHealth() / 100 * 5,
+					damage_type = DAMAGE_TYPE_PURE
+				}
+				ApplyDamage(damage_table)
+			end
+		end
+		return 1.0
+	end)
+end
+
 function GetRandomAbility( owner, allContents, ignore )
 	local ownerAbilities = {}
 	local forcePassive = 0

@@ -412,3 +412,17 @@ function CreateIllusions(hTarget,nIllusions,flDuration,flIncomingDamage,flOutgoi
   ResolveNPCPositions(hTarget:GetAbsOrigin(),flRadius*1.05)
   return illusions
 end
+
+function RandomPointInsideCircle(x, y, radius, min_length)
+  local dist = math.random((min_length or 0), radius)
+  local angle = math.random(0, math.pi * 2)
+
+  local xOffset = dist * math.cos(angle)
+  local yOffset = dist * math.sin(angle)
+
+  return Vector(x + xOffset, y + yOffset, 0)
+end
+
+function IsPointInsideCircle(origin, radius, point)
+  return (point.x - origin.x)^2 + (point.y - origin.y)^2 < radius^2
+end

@@ -268,9 +268,11 @@ function COverthrowGameMode:Test()
 		if playerID ~= nil and playerID ~= -1 then
 			local hero = cmdPlayer:GetAssignedHero()
 
-			local item = CreateItem("item_loot_bonuses", hero, spawnedUnit)
-			CreateItemOnPositionSync(hero:GetAbsOrigin(), item)
-			item:LaunchLoot(false, 100.0, 0.5, hero:GetAbsOrigin())
+			-- local item = CreateItem("item_loot_bonuses", hero, spawnedUnit)
+			-- CreateItemOnPositionSync(hero:GetAbsOrigin(), item)
+			-- item:LaunchLoot(false, 100.0, 0.5, hero:GetAbsOrigin())
+
+			ShrinkingCricle()
 		end
 	end
 end

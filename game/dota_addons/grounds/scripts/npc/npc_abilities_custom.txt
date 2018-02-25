@@ -137,6 +137,30 @@
 		}
 	}
 
+	"grounds_dummy_unit"
+	{
+		"BaseClass"          			    "ability_datadriven"
+		"AbilityName"           			"grounds_dummy_unit"
+		"AbilityBehavior"					"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+
+		"Modifiers"
+		{
+			"modifier_grounds_dummy_unit"
+			{
+				"IsHidden"				"1"
+				"Passive"				"1"
+
+				"States"
+				{
+					"MODIFIER_STATE_UNSELECTABLE"	"MODIFIER_STATE_VALUE_ENABLED"
+					"MODIFIER_STATE_NO_HEALTH_BAR"	"MODIFIER_STATE_VALUE_ENABLED"
+					"MODIFIER_STATE_INVULNERABLE"	"MODIFIER_STATE_VALUE_ENABLED"
+					"MODIFIER_STATE_OUT_OF_GAME"	"MODIFIER_STATE_VALUE_ENABLED"
+				}
+			}
+		}
+	}
+
 	"dota_ability_xp_granter"
 	{
 		"BaseClass"          			    "ability_datadriven"

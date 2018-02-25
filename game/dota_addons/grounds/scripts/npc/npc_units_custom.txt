@@ -2,6 +2,18 @@
 "DOTAUnits"
 {
 	"Version"	"1"
+
+	"npc_grounds_circle_dummy"
+	{
+		"BaseClass"					"npc_dota_creature"
+		"Model"						"models/development/invisiblebox.vmdl"
+		"Ability1"					"grounds_dummy_unit"
+		"AttackCapabilities"		"DOTA_UNIT_CAP_NO_ATTACK"
+		"BountyXP"					"0"
+		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_NONE"
+		"StatusHealth"				"5000"
+		"TeamName"					"DOTA_TEAM_NEUTRALS"
+	}
 	
 	"npc_dota_xp_granter"
 	{
