@@ -267,8 +267,7 @@ function OnAbilityCratePicked( owner )
 	local atLeastOneUpgrade = false
 
 	for i=1,3 do
-		local isUpgrade = PlayerStates[pID].bCompleteBuild or math.random(0,1) == 0
-
+		--local isUpgrade = PlayerStates[pID].bCompleteBuild or math.random(0,1) == 0	
 		if isUpgrade then
 			atLeastOneUpgrade = true
 		end
@@ -277,6 +276,8 @@ function OnAbilityCratePicked( owner )
 			isUpgrade = true
 		end
 
+		local isUpgrade = false
+		
 		if GetTableLength(upgradableAbilities) > 0 and isUpgrade then
 			local ability = GetRandomElement(upgradableAbilities, nil, true)
 			table.insert(contents, ability)

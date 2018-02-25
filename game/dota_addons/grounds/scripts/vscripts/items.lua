@@ -29,7 +29,7 @@ end
 
 function COverthrowGameMode:SpawnLootEntity( spawnPoint )
 	EmitGlobalSound("Item.PickUpGemWorld")
-	local crates = { "item_loot_abilities", "item_loot_supply", "item_loot_bonuses" }
+	local crates = { "item_loot_abilities", "item_loot_abilities","item_loot_abilities", "item_loot_bonuses", "item_loot_supply", }
 	local newItem = CreateItem( GetRandomElement(crates), nil, nil )
 	local drop = CreateItemOnPositionForLaunch( spawnPoint, newItem )
 	local dropRadius = RandomFloat( self.m_GoldRadiusMin, self.m_GoldRadiusMax )
