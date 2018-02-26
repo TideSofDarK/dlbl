@@ -35,6 +35,9 @@
 		{
 			m_ChildRef = resource:"particles/grounds_circlev2_j.vpcf"
 		},
+		{
+			m_ChildRef = resource:"particles/grounds_circlev2_shadow.vpcf"
+		},
 	]
 	m_controlPointConfigurations = 
 	[

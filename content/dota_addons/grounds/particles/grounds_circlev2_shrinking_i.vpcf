@@ -49,9 +49,22 @@
 		},
 		{
 			_class = "C_OP_MovementPlaceOnGround"
-			m_flOffset = 10.0
+			m_flOffset = 8.0
 			m_CollisionGroupName = "DEBRIS"
 			m_bIncludeWater = true
+		},
+		{
+			_class = "C_OP_MovementPlaceOnGround"
+			m_flOffset = 8.0
+			m_flMaxTraceLength = 768.0
+			m_flTolerance = 48.0
+			m_flTraceOffset = 384.0
+			m_flLerpRate = 0.01
+			m_CollisionGroupName = "DEBRIS"
+			m_nRefCP1 = 0
+			m_nLerpCP = 0
+			m_bIncludeWater = true
+			m_bDisableOperator = true
 		},
 	]
 	m_Initializers = 
@@ -65,7 +78,7 @@
 			_class = "C_INIT_RingWave"
 			m_flInitialRadius = 1.0
 			m_nOverrideCP = 1
-			m_flParticlesPerOrbit = 20.0
+			m_flParticlesPerOrbit = 16.0
 			m_bEvenDistribution = true
 			m_flInitialSpeedMin = 1.0
 			m_flInitialSpeedMax = 1.0
@@ -93,12 +106,18 @@
 			m_bActiveRange = true
 			m_bInvert = true
 		},
+		{
+			_class = "C_INIT_PositionOffset"
+			m_OffsetMin = [ 0.0, 0.0, 384.0 ]
+			m_OffsetMax = [ 0.0, 0.0, 384.0 ]
+			m_nControlPointNumber = 2
+		},
 	]
 	m_Emitters = 
 	[
 		{
 			_class = "C_OP_InstantaneousEmitter"
-			m_nParticlesToEmit = 22
+			m_nParticlesToEmit = 50
 		},
 	]
 	m_flConstantRadius = 30.0

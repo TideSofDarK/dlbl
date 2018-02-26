@@ -49,7 +49,7 @@
 		},
 		{
 			_class = "C_OP_MovementPlaceOnGround"
-			m_flOffset = 10.0
+			m_flOffset = 64.0
 			m_CollisionGroupName = "DEBRIS"
 			m_bIncludeWater = true
 		},
@@ -65,7 +65,7 @@
 			_class = "C_INIT_RingWave"
 			m_flInitialRadius = 1.0
 			m_nOverrideCP = 1
-			m_flParticlesPerOrbit = 20.0
+			m_flParticlesPerOrbit = 16.0
 			m_bEvenDistribution = true
 		},
 		{
@@ -96,7 +96,7 @@
 	[
 		{
 			_class = "C_OP_InstantaneousEmitter"
-			m_nParticlesToEmit = 22
+			m_nParticlesToEmit = 96
 		},
 	]
 	m_flConstantRadius = 30.0

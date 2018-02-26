@@ -36,10 +36,9 @@
 		},
 		{
 			_class = "C_OP_MovementPlaceOnGround"
-			m_flOffset = 8.0
+			m_flOffset = 64.0
 			m_CollisionGroupName = "DEBRIS"
 			m_bIncludeWater = true
-			m_bDisableOperator = true
 		},
 	]
 	m_Initializers = 
@@ -90,7 +89,7 @@
 	[
 		{
 			_class = "C_OP_InstantaneousEmitter"
-			m_nParticlesToEmit = 11
+			m_nParticlesToEmit = 29
 		},
 	]
 	m_flConstantRadius = 200.0

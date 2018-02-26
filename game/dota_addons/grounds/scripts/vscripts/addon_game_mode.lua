@@ -272,7 +272,7 @@ function COverthrowGameMode:Test()
 			-- CreateItemOnPositionSync(hero:GetAbsOrigin(), item)
 			-- item:LaunchLoot(false, 100.0, 0.5, hero:GetAbsOrigin())
 
-			ShrinkingCricle()
+			ShrinkingCricle(hero)
 		end
 	end
 end

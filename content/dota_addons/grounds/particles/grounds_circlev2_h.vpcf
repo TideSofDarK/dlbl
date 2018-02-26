@@ -43,6 +43,12 @@
 			m_nFieldOutput = 7
 			m_flOutput = 0.125
 		},
+		{
+			_class = "C_OP_MovementPlaceOnGround"
+			m_flOffset = 64.0
+			m_CollisionGroupName = "DEBRIS"
+			m_bIncludeWater = true
+		},
 	]
 	m_Initializers = 
 	[
