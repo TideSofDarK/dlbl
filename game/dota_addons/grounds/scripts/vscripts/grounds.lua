@@ -70,6 +70,57 @@ for i=0,DOTA_MAX_PLAYERS do
 	end)
 end
 
+_G.GROUNDS_MAX_CRATES_X = 16
+_G.GROUNDS_MAX_CRATES_Y = 16
+
+_G.SPAWN_POINTS = {}
+
+_G.POINT_TO_CRATE = {}
+_G.CRATE_TO_POINT = {}
+
+function InitGrounds()
+	for k,v in pairs(Entities:FindAllByName("grounds_player_spawn")) do
+		table.insert(SPAWN_POINTS, v:GetAbsOrigin())
+	end
+	SPAWN_POINTS = ShuffledList( SPAWN_POINTS )
+
+	SpawnCrates()
+end
+
+function SpawnCrates()
+	local startX = GetWorldMinX()
+	local startY = GetWorldMinY()
+	local endX = GetWorldMaxX()
+	local endY = GetWorldMaxY()
+	local rateX = (math.abs(startX) + math.abs(endX)) / GROUNDS_MAX_CRATES_X
+	local rateY = (math.abs(startY) + math.abs(endY)) / GROUNDS_MAX_CRATES_Y
+
+	for x=1,GROUNDS_MAX_CRATES_X do
+		for y=1,GROUNDS_MAX_CRATES_Y do
+			local pos = Vector(startX + (rateX * x), startY + (rateY * y), 0)
+
+			pos = pos + RandomPointInsideCircle(0, 0, rateX / 2)
+
+			if GridNav:CanFindPath(Vector(-576, -424, 0), pos) then
+				print("Spawning crate at: ", pos)
+
+				local crates = { "item_loot_abilities", "item_loot_abilities","item_loot_abilities", "item_loot_bonuses", "item_loot_supply", }
+				local newItem = CreateItem( GetRandomElement(crates), nil, nil )
+				local drop = CreateItemOnPositionForLaunch( pos, newItem )
+
+				newItem:LaunchLootInitialHeight(false, 1024, 128, 3.0, pos)
+				AddFOWViewer(2, pos, 256, 25.0, false)
+
+				POINT_TO_CRATE[pos] = drop
+				CRATE_TO_POINT[drop] = pos
+				-- Timers:CreateTimer(30, function (  )
+					
+				-- end)
+			end
+		end	
+	end
+end
+
 function ShrinkingCricle(hero)
 	local idleTime = 30
 	local shrinkingTime = 30
@@ -129,15 +180,6 @@ function ShrinkingCricle(hero)
 		return rangeParticle
 	end
 
-	local function GetRandomWorldPoint(percent, centerX, centerY, radius)
-		local centerX = centerX or math.max(GetWorldMaxX(), GetWorldMinX()) + (math.abs(GetWorldMaxX()) + math.abs(GetWorldMinX())) / -2
-		local centerY = centerY or math.max(GetWorldMaxY(), GetWorldMinY()) + (math.abs(GetWorldMaxY()) + math.abs(GetWorldMinY())) / -2
-
-		local radius = radius or (GetWorldMaxX() * percent)
-
-		return RandomPointInsideCircle(centerX, centerY, radius, 128)
-	end
-
 	-- if hero then
 	-- 	CreateShrinkingCircle(hero:GetAbsOrigin(), 1024, 128, 12, function (  )
 			
@@ -145,7 +187,7 @@ function ShrinkingCricle(hero)
 	-- 	return
 	-- end
 
-	local pos = Vector(0,0,0)
+	local pos = GetWorldCenter()
 	local radius = GetWorldMaxX()/2
 	local currentRadius = radius
 	local count = 1
@@ -458,6 +500,14 @@ function COverthrowGameMode:OnPlayerClaimedReward( keys )
 
 	if hero.currentLoot then
 		local loot = hero.currentLoot[option]
+
+		local grounds_loot_notification =
+		{
+			heroID = hero:GetClassname(),
+			content = loot.content,
+			lootType = loot.lootType
+		}
+		
 		if loot.lootType == 1 then
 			if hero:HasAbility(loot.content) then
 				-- Level up owned ability
@@ -511,15 +561,12 @@ function COverthrowGameMode:OnPlayerClaimedReward( keys )
 				if GetTableLength(hero:GetAllAbilities()) >= GROUNDS_MAX_ABILITIES then
 					PlayerStates[pID].bCompleteBuild = true
 				end
+
+				CustomGameEventManager:Send_ServerToAllClients( "grounds_loot_notification", grounds_loot_notification )
 			end
 		elseif loot.lootType == 2 then
 			hero:AddItem(CreateItem(loot.content, hero, hero))
-			local overthrow_item_drop =
-			{
-				hero_id = hero:GetClassname(),
-				dropped_item = loot.content
-			}
-			CustomGameEventManager:Send_ServerToAllClients( "overthrow_item_drop", overthrow_item_drop )
+			CustomGameEventManager:Send_ServerToAllClients( "grounds_loot_notification", grounds_loot_notification )
 		elseif loot.lootType == 3 then
 			hero:EmitSound("DOTA_Item.Hand_Of_Midas")
 			if loot.content == "xp" then
@@ -566,6 +613,7 @@ function COverthrowGameMode:OnPlayerClaimedReward( keys )
 		elseif loot.lootType == 5 then
 			hero:AddItemByName(loot.content)
 		end
+
 		hero.currentLoot = nil
 	end
 end

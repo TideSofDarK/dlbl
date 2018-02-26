@@ -46,6 +46,8 @@ function COverthrowGameMode:OnGameRulesStateChange()
 		self.countdownEnabled = true
 		CustomGameEventManager:Send_ServerToAllClients( "show_timer", {} )
 		DoEntFire( "center_experience_ring_particles", "Start", "0", 0, self, self  )
+
+		ShrinkingCricle()
 	end
 end
 
@@ -70,8 +72,21 @@ function COverthrowGameMode:OnNPCSpawned( event )
 				ParticleManager:SetParticleControlEnt( particleSpawn, PATTACH_ABSORIGIN, spawnedUnit, PATTACH_ABSORIGIN, "attach_origin", spawnedUnit:GetAbsOrigin(), true )
 			end
 		end
-		if not PlayerStates[spawnedUnit:GetPlayerID()].bFirstSpawn then
-			PlayerStates[spawnedUnit:GetPlayerID()].bFirstSpawn = true
+		local pID = spawnedUnit:GetPlayerID()
+		if not PlayerStates[pID].bFirstSpawn then
+			spawnedUnit:AddNewModifier(spawnedUnit, nil, "modifier_no_hero", {})
+			spawnedUnit:SetDayTimeVisionRange(0)
+			PlayerResource:SetCameraTarget(pID, spawnedUnit)
+			Timers:CreateTimer(0.3, function (  )
+				PlayerResource:SetCameraTarget(pID, spawnedUnit)
+				PlayerStates[pID].bFirstSpawn = true
+				spawnedUnit:SetAbsOrigin(SPAWN_POINTS[pID+1])
+				spawnedUnit:SetDayTimeVisionRange(256)
+				spawnedUnit:RemoveModifierByName("modifier_no_hero")
+				Timers:CreateTimer(1.0, function (  )
+					PlayerResource:SetCameraTarget(pID, nil)
+				end)
+			end)
 
 			Timers:CreateTimer(1.0, function (  )
 				for i=1,3 do

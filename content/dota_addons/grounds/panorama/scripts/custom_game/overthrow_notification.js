@@ -37,62 +37,40 @@ function ClearItemSpawnMessage()
 
 //==============================================================
 //==============================================================
-function OnItemDrop( msg )
+function OnLootPicked( msg )
 {
 //	$.Msg( "recent_item_drop: ", msg );
-//	$.Msg( msg.hero_id )
-	$.GetContextPanel().SetHasClass( "recent_item_drop", true );
+	if (!msg.lootType || msg.lootType > 2) return;
 
-	if ( msg.hero_id == "npc_dota_hero_silencer" )
-	{
-		$( "#PickupMessage_Hero_Text" ).SetDialogVariable( "hero_id", $.Localize( "#npc_dota_hero_silencer_notification" ) );
-	}
-	else if ( msg.hero_id == "npc_dota_hero_necrolyte" )
-	{
-		$( "#PickupMessage_Hero_Text" ).SetDialogVariable( "hero_id", $.Localize( "#npc_dota_hero_necrolyte_notification" ) );
-	}
-	else if ( msg.hero_id == "npc_dota_hero_zuus" )
-	{
-		$( "#PickupMessage_Hero_Text" ).SetDialogVariable( "hero_id", $.Localize( "#npc_dota_hero_zuus_notification" ) );
-	}
-	else if ( msg.hero_id == "npc_dota_hero_riki" )
-	{
-		$( "#PickupMessage_Hero_Text" ).SetDialogVariable( "hero_id", $.Localize( "#npc_dota_hero_riki_notification" ) );
-	}
-	else if ( msg.hero_id == "npc_dota_hero_bounty_hunter" )
-	{
-		$( "#PickupMessage_Hero_Text" ).SetDialogVariable( "hero_id", $.Localize( "#npc_dota_hero_bounty_hunter_notification" ) );
-	}
-	else if ( msg.hero_id == "npc_dota_hero_broodmother" )
-	{
-		$( "#PickupMessage_Hero_Text" ).SetDialogVariable( "hero_id", $.Localize( "#npc_dota_hero_broodmother_notification" ) );
-	}
-	else if ( msg.hero_id == "npc_dota_hero_pudge" )
-	{
-		$( "#PickupMessage_Hero_Text" ).SetDialogVariable( "hero_id", $.Localize( "#npc_dota_hero_pudge_notification" ) );
-	}
-	else
-	{
-		$( "#PickupMessage_Hero_Text" ).SetDialogVariable( "hero_id", $.Localize( "#"+msg.hero_id ) );
-	}
+	var pickupMessage = $.CreatePanel( "Panel", $("#OverthrowItemNotification"), "" );
+	pickupMessage.BLoadLayoutSnippet("PickupMessage");
 
-	$( "#PickupMessage_Item_Text" ).SetDialogVariable( "item_id", $.Localize( "#DOTA_Tooltip_Ability_"+msg.dropped_item ) );
+	pickupMessage.SetHasClass( "recent_item_drop", true );
 
-	var hero_image_name = "file://{images}/heroes/" + msg.hero_id + ".png";
-	$( "#PickupMessage_Hero" ).SetImage( hero_image_name );
+	// pickupMessage.FindChildTraverse("PickupMessage_Hero_Text").SetDialogVariable( "hero_id", $.Localize( "#"+msg.heroID ) );
+	// pickupMessage.FindChildTraverse("PickupMessage_Item_Text").SetDialogVariable( "item_id", $.Localize( "#DOTA_Tooltip_Ability_"+msg.content ) );
+
+	var hero_image_name = "file://{images}/heroes/" + msg.heroID + ".png";
+	pickupMessage.FindChildTraverse("PickupMessage_Hero").SetImage( hero_image_name );
 
 	var chest_image_name = "file://{images}/econ/tools/gift_lockless_luckbox.png";
-	$( "#PickupMessage_Chest" ).SetImage( chest_image_name );
-			
-	var item_image_name = "file://{images}/items/" + msg.dropped_item.replace( "item_", "" ) + ".png"
-	$( "#PickupMessage_Item" ).SetImage( item_image_name );
+	pickupMessage.FindChildTraverse("PickupMessage_Chest").SetImage( chest_image_name );
 
-	$.Schedule( 5, ClearDropMessage );
-}
-		
-function ClearDropMessage()
-{
-	$.GetContextPanel().SetHasClass( "recent_item_drop", false );
+	if (msg.lootType == 1) { // Abilities
+		pickupMessage.FindChildTraverse("SlotAbilityIcon").SetHasClass("Hide", false);
+		pickupMessage.FindChildTraverse("SlotAbilityIcon").abilityname = msg.content;
+	}
+	if (msg.lootType == 2) { // Items
+		pickupMessage.FindChildTraverse("SlotItemIcon").SetHasClass("Hide", false);
+		pickupMessage.FindChildTraverse("SlotItemIcon").itemname = msg.content;
+	}
+
+	$.Schedule( 5, function () {
+		pickupMessage.RemoveClass("recent_item_drop");
+		$.Schedule( 1, function () {
+			pickupMessage.RemoveAndDeleteChildren();
+		});
+	});
 }
 
 //==============================================================
@@ -216,7 +194,7 @@ function ClearKillMessage()
 (function () {
 	GameEvents.Subscribe( "item_will_spawn", OnItemWillSpawn );
 	GameEvents.Subscribe( "item_has_spawned", OnItemHasSpawned );
-	GameEvents.Subscribe( "overthrow_item_drop", OnItemDrop );
+	GameEvents.Subscribe( "grounds_loot_notification", OnLootPicked );
     GameEvents.Subscribe( "time_remaining", AlertTimer );
     GameEvents.Subscribe( "overtime_alert", OnOvertimeStart );
     GameEvents.Subscribe( "kill_alert", OnLeaderKilled );

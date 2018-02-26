@@ -413,6 +413,22 @@ function CreateIllusions(hTarget,nIllusions,flDuration,flIncomingDamage,flOutgoi
   return illusions
 end
 
+function GetWorldCenter()
+  local centerX = math.max(GetWorldMaxX(), GetWorldMinX()) + (math.abs(GetWorldMaxX()) + math.abs(GetWorldMinX())) / -2
+  local centerY = math.max(GetWorldMaxY(), GetWorldMinY()) + (math.abs(GetWorldMaxY()) + math.abs(GetWorldMinY())) / -2
+
+  return Vector(centerX, centerY, 0)
+end
+
+function GetRandomWorldPoint(percent)
+  local centerX = GetWorldCenter().x
+  local centerY = GetWorldCenter().y
+
+  local radius = GetWorldMaxX() * percent
+
+  return RandomPointInsideCircle(centerX, centerY, radius, 128)
+end
+
 function RandomPointInsideCircle(x, y, radius, min_length)
   local dist = math.random((min_length or 0), radius)
   local angle = math.random(0, math.pi * 2)

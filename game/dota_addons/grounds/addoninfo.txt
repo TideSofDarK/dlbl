@@ -1,27 +1,12 @@
 "AddonInfo"
 {
-	"maps"			"forest_solo"
+	"maps"			"grounds"
 	"IsPlayable"	"1"
 	"HeroGuidesSupported" "1"
 	"TeamCount" "4"
-	"mines_trio"
+
+	"grounds"
 	{
-					"MaxPlayers"                    "9"
-	}
-	"desert_duo"
-	{
-					"MaxPlayers"                    "10"
-	}
-	"forest_solo"
-	{
-					"MaxPlayers"                    "4"
-	}
-	"desert_quintet"
-	{
-					"MaxPlayers"                    "15"
-	}
-	"temple_quartet"
-	{
-					"MaxPlayers"                    "16"
+		"MaxPlayers"                    "4"
 	}
 }

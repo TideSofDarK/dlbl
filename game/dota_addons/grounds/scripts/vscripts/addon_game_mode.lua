@@ -259,6 +259,8 @@ function COverthrowGameMode:InitGameMode()
 	-- PrintKV(newKV)
 
 	Convars:RegisterCommand( "tc",  Dynamic_Wrap(COverthrowGameMode, 'Test'), "", FCVAR_CHEAT )
+
+	InitGrounds()
 end
 
 function COverthrowGameMode:Test()
@@ -268,11 +270,11 @@ function COverthrowGameMode:Test()
 		if playerID ~= nil and playerID ~= -1 then
 			local hero = cmdPlayer:GetAssignedHero()
 
-			-- local item = CreateItem("item_loot_bonuses", hero, spawnedUnit)
-			-- CreateItemOnPositionSync(hero:GetAbsOrigin(), item)
-			-- item:LaunchLoot(false, 100.0, 0.5, hero:GetAbsOrigin())
+			local item = CreateItem("item_loot_supply", hero, spawnedUnit)
+			CreateItemOnPositionSync(hero:GetAbsOrigin(), item)
+			item:LaunchLoot(false, 100.0, 0.5, hero:GetAbsOrigin())
 
-			ShrinkingCricle(hero)
+			-- ShrinkingCricle(hero)
 		end
 	end
 end
@@ -438,8 +440,8 @@ function COverthrowGameMode:OnThink()
 	
 	if GameRules:State_Get() == DOTA_GAMERULES_STATE_GAME_IN_PROGRESS then
 		--Spawn Gold Bags
-		COverthrowGameMode:ThinkGoldDrop()
-		COverthrowGameMode:ThinkSpecialItemDrop()
+		-- COverthrowGameMode:ThinkGoldDrop()
+		-- COverthrowGameMode:ThinkSpecialItemDrop()
 	end
 
 	return 1
