@@ -76,8 +76,8 @@ function ShrinkingCricle(hero)
 	local rounds = 3
 
 	local function CreateStaticCircle(origin, radius, time, callback)
-		origin.z = 128
 		local dummy = CreateUnitByName("npc_grounds_circle_dummy", origin, false, nil, nil, DOTA_TEAM_NEUTRALS)
+		dummy:SetAbsOrigin(GetGroundPosition(origin, dummy))
 
 		Timers:CreateTimer(function (  )
 			if not IsValidEntity(dummy) then
@@ -103,8 +103,8 @@ function ShrinkingCricle(hero)
 	end
 
 	function CreateShrinkingCircle(origin, radius, targetRadius, time, callback)
-		origin.z = 128
 		local dummy = CreateUnitByName("npc_grounds_circle_dummy", origin, false, nil, nil, DOTA_TEAM_NEUTRALS)
+		dummy:SetAbsOrigin(GetGroundPosition(origin, dummy))
 		
 		Timers:CreateTimer(function (  )
 			if not IsValidEntity(dummy) then
@@ -139,7 +139,7 @@ function ShrinkingCricle(hero)
 	end
 
 	-- if hero then
-	-- 	CreateShrinkingCircle(hero:GetAbsOrigin(), 4096, 128, 12, function (  )
+	-- 	CreateShrinkingCircle(hero:GetAbsOrigin(), 1024, 128, 12, function (  )
 			
 	-- 	end)
 	-- 	return

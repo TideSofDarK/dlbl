@@ -67,6 +67,13 @@
 			m_flTolerance = 48.0
 			m_flLerpRate = 0.01
 			m_nLerpCP = 0
+			m_bDisableOperator = true
+		},
+		{
+			_class = "C_OP_MovementPlaceOnGround"
+			m_flOffset = 8.0
+			m_CollisionGroupName = "DEBRIS"
+			m_bIncludeWater = true
 		},
 	]
 	m_Initializers = 
