@@ -74,15 +74,14 @@ function COverthrowGameMode:OnNPCSpawned( event )
 		end
 		local pID = spawnedUnit:GetPlayerID()
 		if not PlayerStates[pID].bFirstSpawn then
-			spawnedUnit:AddNewModifier(spawnedUnit, nil, "modifier_no_hero", {})
 			spawnedUnit:SetDayTimeVisionRange(0)
 			PlayerResource:SetCameraTarget(pID, spawnedUnit)
 			Timers:CreateTimer(0.3, function (  )
 				PlayerResource:SetCameraTarget(pID, spawnedUnit)
 				PlayerStates[pID].bFirstSpawn = true
-				spawnedUnit:SetAbsOrigin(SPAWN_POINTS[pID+1])
+
 				spawnedUnit:SetDayTimeVisionRange(256)
-				spawnedUnit:RemoveModifierByName("modifier_no_hero")
+
 				Timers:CreateTimer(1.0, function (  )
 					PlayerResource:SetCameraTarget(pID, nil)
 				end)

@@ -79,10 +79,15 @@ _G.POINT_TO_CRATE = {}
 _G.CRATE_TO_POINT = {}
 
 function InitGrounds()
-	for k,v in pairs(Entities:FindAllByName("grounds_player_spawn")) do
-		table.insert(SPAWN_POINTS, v:GetAbsOrigin())
+	local spawnPointsToShuffle = {}
+	for k,v in pairs(Entities:FindAllByName("info_player_start_dota")) do
+		table.insert(spawnPointsToShuffle, v:GetAbsOrigin())
 	end
-	SPAWN_POINTS = ShuffledList( SPAWN_POINTS )
+	spawnPointsToShuffle = ShuffledList( spawnPointsToShuffle )
+
+	for k,v in pairs(Entities:FindAllByName("info_player_start_dota")) do
+		v:SetAbsOrigin(spawnPointsToShuffle[k])
+	end
 
 	SpawnCrates()
 end
