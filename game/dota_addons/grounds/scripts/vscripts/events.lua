@@ -72,31 +72,8 @@ function COverthrowGameMode:OnNPCSpawned( event )
 				ParticleManager:SetParticleControlEnt( particleSpawn, PATTACH_ABSORIGIN, spawnedUnit, PATTACH_ABSORIGIN, "attach_origin", spawnedUnit:GetAbsOrigin(), true )
 			end
 		end
-		local pID = spawnedUnit:GetPlayerID()
-		if not PlayerStates[pID].bFirstSpawn then
-			spawnedUnit:SetDayTimeVisionRange(0)
-			PlayerResource:SetCameraTarget(pID, spawnedUnit)
-			Timers:CreateTimer(0.3, function (  )
-				PlayerResource:SetCameraTarget(pID, spawnedUnit)
-				PlayerStates[pID].bFirstSpawn = true
-
-				spawnedUnit:SetDayTimeVisionRange(256)
-
-				Timers:CreateTimer(1.0, function (  )
-					PlayerResource:SetCameraTarget(pID, nil)
-				end)
-			end)
-
-			Timers:CreateTimer(1.0, function (  )
-				for i=1,3 do
-					local pos = spawnedUnit:GetAbsOrigin() + RotatePosition(Vector(0,0,0), QAngle(0,i * 120,0), spawnedUnit:GetForwardVector()) * 128
-					local item = CreateItem("item_loot_starting", spawnedUnit, spawnedUnit)
-					CreateItemOnPositionSync(spawnedUnit:GetAbsOrigin(), item)
-					item:LaunchLoot(false, 100.0, 0.5, pos)
-				end
-			end)
-		end
 	end
+	OnGroundsNPCSpawned( event )
 end
 
 --------------------------------------------------------------------------------

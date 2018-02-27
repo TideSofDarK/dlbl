@@ -70,8 +70,8 @@ for i=0,DOTA_MAX_PLAYERS do
 	end)
 end
 
-_G.GROUNDS_MAX_CRATES_X = 16
-_G.GROUNDS_MAX_CRATES_Y = 16
+_G.GROUNDS_MAX_CRATES_X = 20
+_G.GROUNDS_MAX_CRATES_Y = 20
 
 _G.SPAWN_POINTS = {}
 
@@ -114,7 +114,7 @@ function SpawnCrates()
 				local drop = CreateItemOnPositionForLaunch( pos, newItem )
 
 				newItem:LaunchLootInitialHeight(false, 1024, 128, 3.0, pos)
-				AddFOWViewer(2, pos, 256, 25.0, false)
+				-- AddFOWViewer(2, pos, 256, 25.0, false)
 
 				POINT_TO_CRATE[pos] = drop
 				CRATE_TO_POINT[drop] = pos
@@ -127,8 +127,8 @@ function SpawnCrates()
 end
 
 function ShrinkingCricle(hero)
-	local idleTime = 30
-	local shrinkingTime = 30
+	local idleTime = 120
+	local shrinkingTime = 60
 	local rounds = 3
 
 	local function CreateStaticCircle(origin, radius, time, callback)
@@ -193,7 +193,7 @@ function ShrinkingCricle(hero)
 	-- end
 
 	local pos = GetWorldCenter()
-	local radius = GetWorldMaxX()/2
+	local radius = GetWorldMaxX()/1.5
 	local currentRadius = radius
 	local count = 1
 	local function ShrinkingRoutine()
@@ -653,6 +653,56 @@ function OnGroundsItemPickUp( event )
 	elseif event.itemname == "item_loot_starting" then
 		OnStartingCratePicked( owner )
 		UTIL_Remove( item )
+	end
+end
+
+function OnGroundsNPCSpawned( event )
+	local spawnedUnit = EntIndexToHScript( event.entindex )
+	if spawnedUnit:IsCourier() then
+		spawnedUnit:AddNewModifier(spawnedUnit, nil, "modifier_invulnerable", {})
+	end
+	if spawnedUnit:IsRealHero() then
+		local pID = spawnedUnit:GetPlayerID()
+		if not PlayerStates[pID].bFirstSpawn then
+			local courier
+			if spawnedUnit:HasItemInInventory("item_courier") then
+				courier = spawnedUnit:FindItemInInventory("item_courier")
+			else
+				courier = CreateItem("item_courier", spawnedUnit, spawnedUnit)
+				spawnedUnit:AddItem(courier)
+			end
+
+			local order = {
+			    UnitIndex = spawnedUnit:entindex(),
+			    OrderType = DOTA_UNIT_ORDER_CAST_NO_TARGET,
+			    TargetIndex = 0,
+			    AbilityIndex = courier:entindex(),
+			    Queue = 0
+			}
+			ExecuteOrderFromTable(order)
+
+			spawnedUnit:SetDayTimeVisionRange(0)
+			PlayerResource:SetCameraTarget(pID, spawnedUnit)
+			Timers:CreateTimer(0.3, function (  )
+				PlayerResource:SetCameraTarget(pID, spawnedUnit)
+				PlayerStates[pID].bFirstSpawn = true
+
+				spawnedUnit:SetDayTimeVisionRange(256)
+
+				Timers:CreateTimer(1.0, function (  )
+					PlayerResource:SetCameraTarget(pID, nil)
+				end)
+			end)
+
+			Timers:CreateTimer(1.0, function (  )
+				for i=1,3 do
+					local pos = spawnedUnit:GetAbsOrigin() + RotatePosition(Vector(0,0,0), QAngle(0,i * 120,0), spawnedUnit:GetForwardVector()) * 128
+					local item = CreateItem("item_loot_starting", spawnedUnit, spawnedUnit)
+					CreateItemOnPositionSync(spawnedUnit:GetAbsOrigin(), item)
+					item:LaunchLoot(false, 100.0, 0.5, pos)
+				end
+			end)
+		end
 	end
 end
 
