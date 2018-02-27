@@ -90,6 +90,19 @@ function InitGrounds()
 	end
 
 	SpawnCrates()
+
+	CustomGameEventManager:RegisterListener("grounds_claim", Dynamic_Wrap( COverthrowGameMode, "OnPlayerClaimedReward" ))
+	CustomGameEventManager:RegisterListener("grounds_spectate", Dynamic_Wrap( COverthrowGameMode, "OnPlayerStartSpectating" ))
+end
+
+function SpawnCrate( pos )
+	local crates = { "item_loot_abilities", "item_loot_abilities","item_loot_abilities", "item_loot_bonuses", "item_loot_supply", }
+	local newItem = CreateItem( GetRandomElement(crates), nil, nil )
+	local drop = CreateItemOnPositionForLaunch( pos, newItem )
+
+	newItem:LaunchLootInitialHeight(false, 1024, 128, 3.0, pos)
+
+	return drop
 end
 
 function SpawnCrates()
@@ -106,14 +119,10 @@ function SpawnCrates()
 
 			pos = pos + RandomPointInsideCircle(0, 0, rateX / 2)
 
-			if GridNav:CanFindPath(Vector(-576, -424, 0), pos) then
+			if IsPointReachable( pos ) then
 				print("Spawning crate at: ", pos)
 
-				local crates = { "item_loot_abilities", "item_loot_abilities","item_loot_abilities", "item_loot_bonuses", "item_loot_supply", }
-				local newItem = CreateItem( GetRandomElement(crates), nil, nil )
-				local drop = CreateItemOnPositionForLaunch( pos, newItem )
-
-				newItem:LaunchLootInitialHeight(false, 1024, 128, 3.0, pos)
+				local drop = SpawnCrate( pos )
 				-- AddFOWViewer(2, pos, 256, 25.0, false)
 
 				POINT_TO_CRATE[pos] = drop
@@ -127,11 +136,12 @@ function SpawnCrates()
 end
 
 function ShrinkingCricle(hero)
-	local idleTime = 120
-	local shrinkingTime = 60
-	local rounds = 3
+	local rounds = {}
+	table.insert(rounds, { idleTime = 120, shrinkingTime = 60 })
+	table.insert(rounds, { idleTime = 60, shrinkingTime = 45 })
+	table.insert(rounds, { idleTime = 60, shrinkingTime = 45 })
 
-	local function CreateStaticCircle(origin, radius, time, callback)
+	function CreateStaticCircle(origin, radius, time, callback)
 		local dummy = CreateUnitByName("npc_grounds_circle_dummy", origin, false, nil, nil, DOTA_TEAM_NEUTRALS)
 		dummy:SetAbsOrigin(GetGroundPosition(origin, dummy))
 
@@ -185,21 +195,24 @@ function ShrinkingCricle(hero)
 		return rangeParticle
 	end
 
-	-- if hero then
-	-- 	CreateShrinkingCircle(hero:GetAbsOrigin(), 1024, 128, 12, function (  )
+	if hero then
+		CreateShrinkingCircle(hero:GetAbsOrigin(), 1024, 128, 12, function (  )
 			
-	-- 	end)
-	-- 	return
-	-- end
+		end)
+		return
+	end
 
 	local pos = GetWorldCenter()
 	local radius = GetWorldMaxX()/1.5
 	local currentRadius = radius
 	local count = 1
 	local function ShrinkingRoutine()
-		local isOver = count > rounds
+		local isOver = count > GetTableLength(rounds)
+		local idleTime
 		if isOver then
-			idleTime = 99999
+			idleTime = 999999
+		else
+			idleTime = rounds[count].idleTime
 		end
 		currentRadius = radius
 		CreateStaticCircle(pos, radius, idleTime, function ()
@@ -209,6 +222,7 @@ function ShrinkingCricle(hero)
 			currentRadius = radius
 			radius = radius / 2
 			pos = RandomPointInsideCircle(pos.x, pos.y, radius, 0)
+			local shrinkingTime = rounds[count].shrinkingTime
 			local t = Timers:CreateTimer(function ()
 				currentRadius = currentRadius - (radius / shrinkingTime)
 				return 1.0
@@ -219,6 +233,22 @@ function ShrinkingCricle(hero)
 				ShrinkingRoutine()
 			end)
 		end)
+
+		-- Additional crate spawn routine
+		if count > 1 then
+			local t = idleTime
+			local rate = 6.0
+			Timers:CreateTimer(function (  )
+				if t > 0 then
+					local pos = RandomPointInsideCircle(pos.x, pos.y, currentRadius, 0)
+					if IsPointReachable( pos ) then
+						SpawnCrate( pos )
+					end
+					t = t - rate
+					return rate
+				end
+			end)
+		end
 	end
 
 	ShrinkingRoutine()
@@ -495,6 +525,18 @@ function OnStartingCratePicked( owner )
 	CustomGameEventManager:Send_ServerToPlayer(owner:GetPlayerOwner(), "grounds_loot_picked", loot)
 end
 
+function COverthrowGameMode:OnPlayerStartSpectating( keys )
+	local pID = keys.PlayerID
+	local hero = PlayerResource:GetPlayer(pID):GetAssignedHero()
+
+	Timers:CreateTimer(3.0, function()
+		hero:RespawnHero(false, false)
+		hero:AddNewModifier(hero, nil, "modifier_spectator", {})
+		hero:SetDayTimeVisionRange(900)
+		hero:SetNightTimeVisionRange(900)
+	end)
+end
+
 function COverthrowGameMode:OnPlayerClaimedReward( keys )
 	local pID = keys.PlayerID
 	local hero = PlayerResource:GetPlayer(pID):GetAssignedHero()
@@ -615,11 +657,29 @@ function COverthrowGameMode:OnPlayerClaimedReward( keys )
 			end
 		elseif loot.lootType == 4 then
 			local newHero = PlayerResource:ReplaceHeroWith(pID, loot.content, 0, 0)
+
+			-- Apply modifier version of Aegis
+			newHero:AddNewModifier(newHero, nil, "modifier_aegis", {})
 		elseif loot.lootType == 5 then
 			hero:AddItemByName(loot.content)
 		end
 
 		hero.currentLoot = nil
+	end
+end
+
+function OnGroundsEntityKilled( event )
+	local killedUnit = EntIndexToHScript( event.entindex_killed )
+	local killedTeam = killedUnit:GetTeam()
+	local hero = EntIndexToHScript( event.entindex_attacker )
+	local heroTeam = hero:GetTeam()
+	local extraTime = 0
+
+	if killedUnit:IsRealHero() then
+		local ply = killedUnit:GetPlayerOwner()
+		if not killedUnit:IsReincarnating() then
+			CustomGameEventManager:Send_ServerToPlayer(ply,"grounds_death_panel",{})
+		end
 	end
 end
 
@@ -664,6 +724,8 @@ function OnGroundsNPCSpawned( event )
 	if spawnedUnit:IsRealHero() then
 		local pID = spawnedUnit:GetPlayerID()
 		if not PlayerStates[pID].bFirstSpawn then
+			PlayerStates[pID].bFirstSpawn = true
+
 			local courier
 			if spawnedUnit:HasItemInInventory("item_courier") then
 				courier = spawnedUnit:FindItemInInventory("item_courier")
@@ -681,11 +743,12 @@ function OnGroundsNPCSpawned( event )
 			}
 			ExecuteOrderFromTable(order)
 
+			spawnedUnit:SetRespawnsDisabled(true)
+
 			spawnedUnit:SetDayTimeVisionRange(0)
 			PlayerResource:SetCameraTarget(pID, spawnedUnit)
 			Timers:CreateTimer(0.3, function (  )
 				PlayerResource:SetCameraTarget(pID, spawnedUnit)
-				PlayerStates[pID].bFirstSpawn = true
 
 				spawnedUnit:SetDayTimeVisionRange(256)
 
@@ -757,6 +820,14 @@ function COverthrowGameMode:FilterExecuteOrder( filterTable )
 
     if order_type == DOTA_UNIT_ORDER_RADAR or order_type == DOTA_UNIT_ORDER_GLYPH then return end
 
+    if unit:IsRealHero() and unit:HasModifier("modifier_spectator") then
+    	if order_type == DOTA_UNIT_ORDER_MOVE_TO_POSITION or order_type == DOTA_UNIT_ORDER_MOVE_TO_TARGET then
+    		return true
+    	else
+    		return false
+    	end
+    end
+
     if order_type == DOTA_UNIT_ORDER_PICKUP_ITEM then
     	local container = EntIndexToHScript(targetIndex)
     	local item = container:GetContainedItem()
@@ -766,7 +837,7 @@ function COverthrowGameMode:FilterExecuteOrder( filterTable )
 		        if not IsValidEntity(unit) then return end
 		        if not IsValidEntity(container) or not IsValidEntity(item) then return end
 		        if unit._vLastOrderFilterTable ~= filterTable then return end
-		        if (o-container:GetAbsOrigin()):Length2D() < 64 then
+		        if (o-container:GetAbsOrigin()):Length2D() < 96 then
 		        	if not unit:IsRealHero() then
 		        		return nil
 		        	end

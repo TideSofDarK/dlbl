@@ -1,0 +1,45 @@
+<root>
+	<styles>
+		<include src="s2r://panorama/styles/dotastyles.vcss_c" />
+		<include src="file://{resources}/styles/custom_game/grounds_death.css" />
+	</styles>
+	<script>
+		function Spectate() {
+			GameEvents.SendCustomGameEventToServer("grounds_spectate", {})
+
+			//$.Schedule(3.0, function () {
+				$.GetContextPanel().SetHasClass("Show", false)
+				$("#YouDiedLabel").AddClass("Bend")
+
+				$("#Loader").SetHasClass("Hide", false)
+				$("#Content").visible = false;
+
+				//Game.StopMusic();
+				//Game.EmitSound("UI.Spectate");
+			//});
+		}
+
+		(function () {
+			GameEvents.Subscribe("grounds_death_panel", function () {
+				$.GetContextPanel().SetHasClass("Show", true)
+				$("#YouDiedLabel").RemoveClass("Bend")
+
+				$("#Loader").SetHasClass("Hide", true)
+				$("#Content").visible = true;
+
+				//Game.PlayMusic("UI.Death");
+			})
+		})();
+	</script>
+	<Panel style="transition-duration: 1.5s; transition-delay: 1.5s;" class="WindowAnimation OverlayRoot">
+		<Panel class="OverlayRoot"/>
+		<Panel class="Content" id="Content">
+			<Label style="transition-duration: 1.5s; transition-delay: 1.5s;" class="WindowAnimation Bend" id="YouDiedLabel" text="YOU DIED"/>
+			<Button onactivate="Spectate()" class="ButtonBevel" id="SpectateButton">
+				<Label id="SpectateButtonLabel" class="WindowLabel" text="#Spectate"/>
+			</Button>
+			<!-- <Label class="WindowAnimation" html="true" id="WaitForSpectateLabel" text="#wait_for_Spectate"/> -->
+		</Panel>
+		<Panel class="Loader Hide" id="Loader"/>
+	</Panel>
+</root>

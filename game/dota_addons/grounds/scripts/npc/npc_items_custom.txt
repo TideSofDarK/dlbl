@@ -1,6 +1,40 @@
 "DOTAAbilities"
 {
 	//=================================================================================================================
+	// Suicide
+	//=================================================================================================================
+	"item_suicide"
+	{
+		"BaseClass"                 "item_datadriven"
+		"ID"              "1999"
+		"AbilityBehavior"       "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"Model"							"models/gameplay/attrib_tome_str.vmdl"
+		"skin" "1"
+		"Effect"            "particles/generic_gameplay/dropped_item.vpcf"
+		"AbilityTextureName"      "item_book_of_strength"
+
+		"ItemCost"            "0"
+		"ItemShopTags"          "consumable"
+		"ItemQuality"           "consumable"
+		"ItemAliases"         "book"
+		"ItemInitialCharges" "1"
+		"ItemPurchasable"				"0"
+		"ItemStackable"         "1"
+		"ItemPermanent"         "0"
+
+		"OnSpellStart"
+		{
+			"Damage"
+			{
+				"Target"		"CASTER"
+				"Type"			"DAMAGE_TYPE_PURE"
+				"Damage"		"99999"
+			}
+			"SpendCharge"
+			{}
+		}
+	}
+	//=================================================================================================================
 	// Book of Strength
 	//=================================================================================================================
 	"item_book_of_strength"

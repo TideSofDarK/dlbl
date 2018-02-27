@@ -132,6 +132,7 @@ function COverthrowGameMode:OnEntityKilled( event )
 	local hero = EntIndexToHScript( event.entindex_attacker )
 	local heroTeam = hero:GetTeam()
 	local extraTime = 0
+	OnGroundsEntityKilled( event )
 	if killedUnit:IsRealHero() then
 		self.allSpawned = true
 		--print("Hero has been killed")
@@ -180,17 +181,17 @@ function COverthrowGameMode:OnEntityKilled( event )
 				end
 			end
 		end
-		if killedUnit:GetRespawnTime() > 10 then
-			--print("Hero has long respawn time")
-			if killedUnit:IsReincarnating() == true then
-				--print("Set time for Wraith King respawn disabled")
-				return nil
-			else
-				COverthrowGameMode:SetRespawnTime( killedTeam, killedUnit, extraTime )
-			end
-		else
-			COverthrowGameMode:SetRespawnTime( killedTeam, killedUnit, extraTime )
-		end
+		-- if killedUnit:GetRespawnTime() > 10 then
+		-- 	--print("Hero has long respawn time")
+		-- 	if killedUnit:IsReincarnating() == true then
+		-- 		--print("Set time for Wraith King respawn disabled")
+		-- 		return nil
+		-- 	else
+		-- 		COverthrowGameMode:SetRespawnTime( killedTeam, killedUnit, extraTime )
+		-- 	end
+		-- else
+		-- 	COverthrowGameMode:SetRespawnTime( killedTeam, killedUnit, extraTime )
+		-- end
 	end
 end
 
