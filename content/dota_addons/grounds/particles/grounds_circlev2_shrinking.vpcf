@@ -17,7 +17,6 @@
 		},
 		{
 			m_ChildRef = resource:"particles/grounds_circlev2_shrinking_f.vpcf"
-			m_bDisableChild = true
 		},
 		{
 			m_ChildRef = resource:"particles/grounds_circlev2_shrinking_i.vpcf"

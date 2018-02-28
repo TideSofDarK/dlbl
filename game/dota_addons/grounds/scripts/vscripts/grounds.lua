@@ -164,7 +164,7 @@ function ShrinkingCricle(hero)
 
 		local rangeParticle = ParticleManager:CreateParticle("particles/grounds_circlev2.vpcf", PATTACH_ABSORIGIN, dummy)
 		ParticleManager:SetParticleControlEnt(rangeParticle, 0, dummy, PATTACH_ABSORIGIN_FOLLOW, "attach_origin", dummy:GetAbsOrigin(), true)
-		ParticleManager:SetParticleControl(rangeParticle, 1, Vector(radius, 1, 1))
+		ParticleManager:SetParticleControl(rangeParticle, 1, Vector(math.ceil(radius), 1, 1))
 		-- ParticleManager:SetParticleControl(rangeParticle, 4, Vector(255, 255, 255))
 
 		Timers:CreateTimer(time, function (  )
@@ -195,6 +195,9 @@ function ShrinkingCricle(hero)
 			end
 		end)
 
+		-- DebugDrawSphere(origin, Vector(0,0,255), 255, radius, true, time) 
+		-- DebugDrawSphere(origin, Vector(0,0,255), 255, targetRadius, true, time) 
+
 		local rangeParticle = ParticleManager:CreateParticle("particles/grounds_circlev2_shrinking.vpcf", PATTACH_ABSORIGIN, dummy)
 		ParticleManager:SetParticleControlEnt(rangeParticle, 0, dummy, PATTACH_ABSORIGIN_FOLLOW, "attach_origin", dummy:GetAbsOrigin(), true)
 		ParticleManager:SetParticleControl(rangeParticle, 1, Vector(radius, 1, -rate))
@@ -211,7 +214,7 @@ function ShrinkingCricle(hero)
 	end
 
 	if hero then
-		CreateShrinkingCircle(hero:GetAbsOrigin(), 4096, 128, 5, function (  )
+		CreateShrinkingCircle(hero:GetAbsOrigin(), 16352, 13081, 60, function ()
 			
 		end)
 		return
@@ -219,10 +222,10 @@ function ShrinkingCricle(hero)
 
 	local count = 1
 	local center = GetWorldCenter()
-	local radius = GetWorldMaxX() * rounds[count].radius
-	local currentRadius = radius
+	local targetRadius = GetWorldMaxX() * rounds[count].radius
+	local currentRadius
 	
-	local function ShrinkingRoutine()
+	function ShrinkingRoutine()
 		local isOver = count >= GetTableLength(rounds)
 		local idleTime
 		if isOver then
@@ -230,20 +233,30 @@ function ShrinkingCricle(hero)
 		else
 			idleTime = rounds[count].idleTime
 		end
-		currentRadius = radius
-		CreateStaticCircle(center, radius, idleTime, function ()
+
+		currentRadius = targetRadius
+
+		CreateStaticCircle(center, targetRadius, idleTime, function ()
 			if isOver then
 				return
 			end
-			currentRadius = radius
-			radius = GetWorldMaxX() * rounds[count+1].radius
-			center = RandomPointInsideCircle(center.x, center.y, currentRadius - radius, 0)
+
+			currentRadius = targetRadius
+
+			targetRadius = GetWorldMaxX() * rounds[count+1].radius
+
+			-- center = RandomPointInsideCircle(center.x, center.y, currentRadius - targetRadius, 0)
+
 			local shrinkingTime = rounds[count].shrinkingTime
+
+			local rate = (currentRadius - targetRadius) / shrinkingTime
 			local t = Timers:CreateTimer(function ()
-				currentRadius = currentRadius - (radius / shrinkingTime)
+				currentRadius = currentRadius - rate
+				-- DebugDrawSphere(center, Vector(0,255,0), 255, currentRadius, true, 1.0) 
 				return 1.0
 			end)
-			CreateShrinkingCircle(center, currentRadius, radius, shrinkingTime, function ()
+
+			CreateShrinkingCircle(center, currentRadius, targetRadius, shrinkingTime, function ()
 				count = count + 1
 				Timers:RemoveTimer(t)
 				ShrinkingRoutine()

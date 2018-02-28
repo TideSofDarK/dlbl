@@ -15,6 +15,7 @@
 			m_flAnimationRate = 2.0
 			m_nOrientationType = 2
 			m_flOverbrightFactor = 2.0
+			m_bDisableZBuffering = true
 		},
 	]
 	m_Operators = 

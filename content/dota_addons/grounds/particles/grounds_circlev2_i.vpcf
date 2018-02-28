@@ -9,9 +9,10 @@
 			m_flTextureVWorldSize = 300.0
 			m_flOverbrightFactor = 8.0
 			m_hTexture = resource:"materials/particle/electricity/electricity_22_d.vtex"
-			m_nMaxTesselation = 32
+			m_nMaxTesselation = 232
 			m_bSaturateColorPreAlphaBlend = false
 			m_nOrientationType = 2
+			m_bDisableZBuffering = true
 		},
 	]
 	m_Operators = 
@@ -52,6 +53,7 @@
 			m_flOffset = 64.0
 			m_CollisionGroupName = "DEBRIS"
 			m_bIncludeWater = true
+			m_bDisableOperator = true
 		},
 	]
 	m_Initializers = 
@@ -65,7 +67,7 @@
 			_class = "C_INIT_RingWave"
 			m_flInitialRadius = 1.0
 			m_nOverrideCP = 1
-			m_flParticlesPerOrbit = 32.0
+			m_flParticlesPerOrbit = 232.0
 			m_bEvenDistribution = true
 		},
 		{
@@ -96,7 +98,7 @@
 	[
 		{
 			_class = "C_OP_InstantaneousEmitter"
-			m_nParticlesToEmit = 140
+			m_nParticlesToEmit = 379
 		},
 	]
 	m_flConstantRadius = 35.0
@@ -123,4 +125,5 @@
 			]
 		},
 	]
+	m_nMaxParticles = 600
 }

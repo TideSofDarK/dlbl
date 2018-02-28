@@ -6,7 +6,7 @@
 	[
 		{
 			_class = "C_OP_RenderRopes"
-			m_nMaxTesselation = 16
+			m_nMaxTesselation = 116
 			m_flTextureVWorldSize = 2000.0
 			m_flTextureVScrollRate = 75.0
 			m_nOrientationType = 2
@@ -14,16 +14,18 @@
 			m_hTexture = resource:"materials/particle/beam_energy_01.vtex"
 			m_flAddSelfAmount = 2.0
 			m_bLightenMode = true
+			m_bDisableZBuffering = true
 		},
 		{
 			_class = "C_OP_RenderRopes"
-			m_nMaxTesselation = 16
+			m_nMaxTesselation = 116
 			m_flTextureVWorldSize = 2000.0
 			m_flTextureVScrollRate = -150.0
 			m_nOrientationType = 2
 			m_flAddSelfAmount = 2.0
 			m_bAdditive = true
 			m_hTexture = resource:"materials/particle/beam_energy_01.vtex"
+			m_bDisableZBuffering = true
 		},
 	]
 	m_Operators = 
@@ -39,6 +41,7 @@
 			m_flOffset = 32.0
 			m_CollisionGroupName = "DEBRIS"
 			m_bIncludeWater = true
+			m_bDisableOperator = true
 		},
 		{
 			_class = "C_OP_MovementPlaceOnGround"
@@ -62,9 +65,9 @@
 		},
 		{
 			_class = "C_INIT_RingWave"
-			m_flInitialRadius = 1.0
+			m_flInitialRadius = 16352.0
 			m_nOverrideCP = 1
-			m_flParticlesPerOrbit = 9.0
+			m_flParticlesPerOrbit = 116.0
 			m_bEvenDistribution = true
 			m_flInitialSpeedMin = 1.0
 			m_flInitialSpeedMax = 1.0
@@ -103,17 +106,18 @@
 			m_OffsetMin = [ 0.0, 0.0, 384.0 ]
 			m_OffsetMax = [ 0.0, 0.0, 384.0 ]
 			m_nControlPointNumber = 2
+			m_bDisableOperator = true
 		},
 	]
 	m_Emitters = 
 	[
 		{
 			_class = "C_OP_InstantaneousEmitter"
-			m_nParticlesToEmit = 43
+			m_nParticlesToEmit = 325
 		},
 	]
 	m_flConstantRadius = 200.0
-	m_nMaxParticles = 22
+	m_nMaxParticles = 500
 	m_controlPointConfigurations = 
 	[
 		{

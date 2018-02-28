@@ -16,6 +16,7 @@
 			m_flRadiusScale = 3.0
 			m_nMaxTesselation = 6
 			m_nMinTesselation = 6
+			m_bDisableZBuffering = true
 		},
 	]
 	m_Operators = 
@@ -74,6 +75,7 @@
 			m_flOffset = 8.0
 			m_CollisionGroupName = "DEBRIS"
 			m_bIncludeWater = true
+			m_bDisableOperator = true
 		},
 	]
 	m_Initializers = 
@@ -105,6 +107,7 @@
 			m_OffsetMin = [ 0.0, 0.0, 384.0 ]
 			m_OffsetMax = [ 0.0, 0.0, 384.0 ]
 			m_nControlPointNumber = 2
+			m_bDisableOperator = true
 		},
 		{
 			_class = "C_INIT_PositionPlaceOnGround"

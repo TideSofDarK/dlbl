@@ -455,7 +455,7 @@ function GetWorldCenter()
   local centerX = math.max(GetWorldMaxX(), GetWorldMinX()) + (math.abs(GetWorldMaxX()) + math.abs(GetWorldMinX())) / -2
   local centerY = math.max(GetWorldMaxY(), GetWorldMinY()) + (math.abs(GetWorldMaxY()) + math.abs(GetWorldMinY())) / -2
 
-  return Vector(centerX, centerY, 0)
+  return Vector(centerX, centerY, 256)
 end
 
 function GetRandomWorldPoint(percent)
