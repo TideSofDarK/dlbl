@@ -671,7 +671,8 @@ function COverthrowGameMode:OnPlayerClaimedReward( keys )
 			end
 		elseif loot.lootType == 4 then
 			local newHero = PlayerResource:ReplaceHeroWith(pID, loot.content, 0, 0)
-
+			UTIL_Remove(hero)
+			
 			-- Apply modifier version of Aegis
 			newHero:AddNewModifier(newHero, nil, "modifier_aegis", {})
 		elseif loot.lootType == 5 then
