@@ -137,9 +137,9 @@ end
 
 function ShrinkingCricle(hero)
 	local rounds = {}
-	table.insert(rounds, { idleTime = 120, shrinkingTime = 60 })
-	table.insert(rounds, { idleTime = 60, shrinkingTime = 45 })
-	table.insert(rounds, { idleTime = 60, shrinkingTime = 45 })
+	table.insert(rounds, { idleTime = 120, shrinkingTime = 60, crateRate = 10 })
+	table.insert(rounds, { idleTime = 60, shrinkingTime = 45, crateRate = 10 })
+	table.insert(rounds, { idleTime = 60, shrinkingTime = 45, crateRate = 10 })
 
 	function CreateStaticCircle(origin, radius, time, callback)
 		local dummy = CreateUnitByName("npc_grounds_circle_dummy", origin, false, nil, nil, DOTA_TEAM_NEUTRALS)
@@ -202,8 +202,8 @@ function ShrinkingCricle(hero)
 		return
 	end
 
-	local pos = GetWorldCenter()
-	local radius = GetWorldMaxX()/1.5
+	local center = GetWorldCenter()
+	local radius = GetWorldMaxX()
 	local currentRadius = radius
 	local count = 1
 	local function ShrinkingRoutine()
@@ -215,19 +215,19 @@ function ShrinkingCricle(hero)
 			idleTime = rounds[count].idleTime
 		end
 		currentRadius = radius
-		CreateStaticCircle(pos, radius, idleTime, function ()
+		CreateStaticCircle(center, radius, idleTime, function ()
 			if isOver then
 				return
 			end
 			currentRadius = radius
 			radius = radius / 2
-			pos = RandomPointInsideCircle(pos.x, pos.y, radius, 0)
+			center = RandomPointInsideCircle(center.x, center.y, radius, 0)
 			local shrinkingTime = rounds[count].shrinkingTime
 			local t = Timers:CreateTimer(function ()
 				currentRadius = currentRadius - (radius / shrinkingTime)
 				return 1.0
 			end)
-			CreateShrinkingCircle(pos, radius * 2, radius, shrinkingTime, function ()
+			CreateShrinkingCircle(center, radius * 2, radius, shrinkingTime, function ()
 				count = count + 1
 				Timers:RemoveTimer(t)
 				ShrinkingRoutine()
@@ -237,15 +237,22 @@ function ShrinkingCricle(hero)
 		-- Additional crate spawn routine
 		if count > 1 then
 			local t = idleTime
-			local rate = 6.0
+
+			local crateRate
+			if rounds[count] then
+				crateRate = rounds[count].crateRate
+			else
+				crateRate = rounds[count - 1].crateRate
+			end
+
 			Timers:CreateTimer(function (  )
 				if t > 0 then
-					local pos = RandomPointInsideCircle(pos.x, pos.y, currentRadius, 0)
+					local pos = RandomPointInsideCircle(center.x, center.y, currentRadius, 0)
 					if IsPointReachable( pos ) then
 						SpawnCrate( pos )
 					end
-					t = t - rate
-					return rate
+					t = t - crateRate
+					return crateRate
 				end
 			end)
 		end
@@ -253,10 +260,11 @@ function ShrinkingCricle(hero)
 
 	ShrinkingRoutine()
 
+	-- Damage
 	Timers:CreateTimer(function ()
 		for k,v in pairs(HeroList:GetAllHeroes()) do
-			-- DebugDrawSphere(pos, Vector(255,0,0), currentRadius, currentRadius, true, 1.0)
-			if not IsPointInsideCircle(pos, currentRadius, v:GetAbsOrigin()) then
+			DebugDrawCircle(center, Vector(255,0,0), 255, currentRadius, true, 1.0) 
+			if not IsPointInsideCircle(center, currentRadius, v:GetAbsOrigin()) then
 				local damage_table = {
 					victim = v,
 					attacker = v,
@@ -598,7 +606,7 @@ function COverthrowGameMode:OnPlayerClaimedReward( keys )
 						break
 					end
 				end
-				if ownerOfAbility then
+				if ownerOfAbility and not string.match(AbilitiesKV[loot.content].AbilityBehavior, "DOTA_ABILITY_BEHAVIOR_PASSIVE") then
 					PrecacheUnitByNameAsync(ownerOfAbility, function ()
 						
 					end, hero:GetPlayerID())
@@ -691,7 +699,7 @@ function OnGroundsItemPickUp( event )
 	local forcedRarity
 
 	-- Give bonus or supply crate if everything is maxed out
-	if PlayerStates[pID].bMaxedOut and event.itemname == "item_loot_abilities" then
+	if PlayerStates[pID].bCompleteBuild and event.itemname == "item_loot_abilities" then
 		forcedRarity = "Rare"
 
 		if RandomInt(0, 1) == 0 then

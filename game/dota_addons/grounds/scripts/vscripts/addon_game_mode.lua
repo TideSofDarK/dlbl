@@ -208,6 +208,7 @@ function COverthrowGameMode:InitGameMode()
 	GameRules:GetGameModeEntity():SetBountyRunePickupFilter( Dynamic_Wrap( COverthrowGameMode, "BountyRunePickupFilter" ), self )
 	GameRules:GetGameModeEntity():SetExecuteOrderFilter( Dynamic_Wrap( COverthrowGameMode, "ExecuteOrderFilter" ), self )
 	GameRules:GetGameModeEntity():SetCustomGameForceHero("npc_dota_hero_wisp")
+	GameRules:GetGameModeEntity():SetBuybackEnabled( false )
 
 	GameRules:GetGameModeEntity():SetExecuteOrderFilter( Dynamic_Wrap( COverthrowGameMode, "FilterExecuteOrder" ), self )
 
@@ -269,7 +270,7 @@ function COverthrowGameMode:Test()
 		if playerID ~= nil and playerID ~= -1 then
 			local hero = cmdPlayer:GetAssignedHero()
 
-			local item = CreateItem("item_loot_supply", hero, spawnedUnit)
+			local item = CreateItem("item_loot_abilities", hero, spawnedUnit)
 			CreateItemOnPositionSync(hero:GetAbsOrigin(), item)
 			item:LaunchLoot(false, 100.0, 0.5, hero:GetAbsOrigin())
 

@@ -1,11 +1,11 @@
 "AddonInfo"
 {
-	"maps"			"grounds"
+	"maps"			"battleground"
 	"IsPlayable"	"1"
 	"HeroGuidesSupported" "1"
 	"TeamCount" "4"
 
-	"grounds"
+	"battleground"
 	{
 		"MaxPlayers"                    "4"
 	}

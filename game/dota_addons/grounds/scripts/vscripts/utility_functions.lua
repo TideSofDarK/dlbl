@@ -482,5 +482,5 @@ function IsPointInsideCircle(origin, radius, point)
 end
 
 function IsPointReachable( pos )
-  return GridNav:CanFindPath(Vector(-576, -424, 0), pos)
+  return GridNav:CanFindPath(Vector(-6538.12, 103.942, 520), pos)
 end
