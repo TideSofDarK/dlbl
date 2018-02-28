@@ -148,7 +148,7 @@ function ShrinkingCricle(hero)
 		Timers:CreateTimer(function (  )
 			if not IsValidEntity(dummy) then
 			else
-				AddFOWViewer(2, origin, 256, 0.5, false)
+				AddFOWViewer(2, origin, 32, 0.5, false)
 				return 0.5
 			end
 		end)
@@ -171,18 +171,24 @@ function ShrinkingCricle(hero)
 	function CreateShrinkingCircle(origin, radius, targetRadius, time, callback)
 		local dummy = CreateUnitByName("npc_grounds_circle_dummy", origin, false, nil, nil, DOTA_TEAM_NEUTRALS)
 		dummy:SetAbsOrigin(GetGroundPosition(origin, dummy))
+
+		local rate = (radius - targetRadius) / time
 		
+		local debug = radius
 		Timers:CreateTimer(function (  )
 			if not IsValidEntity(dummy) then
+
 			else
-				AddFOWViewer(2, origin, 256, 0.5, false)
-				return 0.5
+				AddFOWViewer(2, origin, 32, 1.0, false)
+				-- DebugDrawSphere(origin, Vector(255,0,0), 255, debug, true, 1.0) 
+				debug = debug - rate
+				return 1.0
 			end
 		end)
 
 		local rangeParticle = ParticleManager:CreateParticle("particles/grounds_circlev2_shrinking.vpcf", PATTACH_ABSORIGIN, dummy)
 		ParticleManager:SetParticleControlEnt(rangeParticle, 0, dummy, PATTACH_ABSORIGIN_FOLLOW, "attach_origin", dummy:GetAbsOrigin(), true)
-		ParticleManager:SetParticleControl(rangeParticle, 1, Vector(radius, 1, targetRadius / -time))
+		ParticleManager:SetParticleControl(rangeParticle, 1, Vector(radius, 1, -rate))
 		-- ParticleManager:SetParticleControl(rangeParticle, 4, Vector(0, 153, 204))
 		
 		Timers:CreateTimer(time, function (  )
@@ -196,7 +202,7 @@ function ShrinkingCricle(hero)
 	end
 
 	if hero then
-		CreateShrinkingCircle(hero:GetAbsOrigin(), 1024, 128, 12, function (  )
+		CreateShrinkingCircle(hero:GetAbsOrigin(), 4096, 128, 5, function (  )
 			
 		end)
 		return
@@ -263,7 +269,7 @@ function ShrinkingCricle(hero)
 	-- Damage
 	Timers:CreateTimer(function ()
 		for k,v in pairs(HeroList:GetAllHeroes()) do
-			DebugDrawCircle(center, Vector(255,0,0), 255, currentRadius, true, 1.0) 
+			-- DebugDrawSphere(center, Vector(255,0,0), 255, currentRadius, true, 1.0) 
 			if not IsPointInsideCircle(center, currentRadius, v:GetAbsOrigin()) then
 				local damage_table = {
 					victim = v,

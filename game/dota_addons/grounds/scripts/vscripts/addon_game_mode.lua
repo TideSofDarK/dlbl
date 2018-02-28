@@ -270,11 +270,22 @@ function COverthrowGameMode:Test()
 		if playerID ~= nil and playerID ~= -1 then
 			local hero = cmdPlayer:GetAssignedHero()
 
-			local item = CreateItem("item_loot_abilities", hero, spawnedUnit)
-			CreateItemOnPositionSync(hero:GetAbsOrigin(), item)
-			item:LaunchLoot(false, 100.0, 0.5, hero:GetAbsOrigin())
+			if hero.rangeParticle then ParticleManager:DestroyParticle(hero.rangeParticle, true) end
 
-			-- ShrinkingCricle(hero)
+			-- hero.rangeParticle = ParticleManager:CreateParticle("particles/grounds_circlev3.vpcf", PATTACH_ABSORIGIN, hero)
+			-- ParticleManager:SetParticleControlEnt(hero.rangeParticle, 0, hero, PATTACH_ABSORIGIN_FOLLOW, "attach_origin", hero:GetAbsOrigin(), true)
+			-- ParticleManager:SetParticleControl(hero.rangeParticle, 1, Vector(256, 1, 128 / 5))
+
+			-- Timers:CreateTimer(function (  )
+			-- 	ParticleManager:SetParticleControl(hero.rangeParticle, 1, Vector(math.random(250, 500), 1, 1))
+			-- 	return 0.5
+			-- end)
+
+			-- local item = CreateItem("item_loot_abilities", hero, spawnedUnit)
+			-- CreateItemOnPositionSync(hero:GetAbsOrigin(), item)
+			-- item:LaunchLoot(false, 100.0, 0.5, hero:GetAbsOrigin())
+
+			ShrinkingCricle(hero)
 		end
 	end
 end
