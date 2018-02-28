@@ -89,7 +89,11 @@ function InitGrounds()
 		v:SetAbsOrigin(spawnPointsToShuffle[k])
 	end
 
-	SpawnCrates()
+	-- SpawnCrates()
+
+	for k,v in pairs(Entities:FindAllByName("grounds_crate_predefined")) do
+		SpawnCrate( v:GetAbsOrigin() )
+	end
 
 	CustomGameEventManager:RegisterListener("grounds_claim", Dynamic_Wrap( COverthrowGameMode, "OnPlayerClaimedReward" ))
 	CustomGameEventManager:RegisterListener("grounds_spectate", Dynamic_Wrap( COverthrowGameMode, "OnPlayerStartSpectating" ))
@@ -137,9 +141,14 @@ end
 
 function ShrinkingCricle(hero)
 	local rounds = {}
-	table.insert(rounds, { idleTime = 120, shrinkingTime = 60, crateRate = 10 })
-	table.insert(rounds, { idleTime = 60, shrinkingTime = 45, crateRate = 10 })
-	table.insert(rounds, { idleTime = 60, shrinkingTime = 45, crateRate = 10 })
+	for _,roundTable in pairs(LoadKeyValues("scripts/kv/rounds.kv")) do
+		local round = {}
+		for k,v in pairs(roundTable) do
+			round[k] = tonumber(v)
+		end
+		rounds[tonumber(_)] = round
+	end
+	PrintTable(rounds)
 
 	function CreateStaticCircle(origin, radius, time, callback)
 		local dummy = CreateUnitByName("npc_grounds_circle_dummy", origin, false, nil, nil, DOTA_TEAM_NEUTRALS)
@@ -208,12 +217,13 @@ function ShrinkingCricle(hero)
 		return
 	end
 
-	local center = GetWorldCenter()
-	local radius = GetWorldMaxX()
-	local currentRadius = radius
 	local count = 1
+	local center = GetWorldCenter()
+	local radius = GetWorldMaxX() * rounds[count].radius
+	local currentRadius = radius
+	
 	local function ShrinkingRoutine()
-		local isOver = count > GetTableLength(rounds)
+		local isOver = count >= GetTableLength(rounds)
 		local idleTime
 		if isOver then
 			idleTime = 999999
@@ -226,14 +236,14 @@ function ShrinkingCricle(hero)
 				return
 			end
 			currentRadius = radius
-			radius = radius / 2
-			center = RandomPointInsideCircle(center.x, center.y, radius, 0)
+			radius = GetWorldMaxX() * rounds[count+1].radius
+			center = RandomPointInsideCircle(center.x, center.y, currentRadius - radius, 0)
 			local shrinkingTime = rounds[count].shrinkingTime
 			local t = Timers:CreateTimer(function ()
 				currentRadius = currentRadius - (radius / shrinkingTime)
 				return 1.0
 			end)
-			CreateShrinkingCircle(center, radius * 2, radius, shrinkingTime, function ()
+			CreateShrinkingCircle(center, currentRadius, radius, shrinkingTime, function ()
 				count = count + 1
 				Timers:RemoveTimer(t)
 				ShrinkingRoutine()
@@ -672,7 +682,7 @@ function COverthrowGameMode:OnPlayerClaimedReward( keys )
 		elseif loot.lootType == 4 then
 			local newHero = PlayerResource:ReplaceHeroWith(pID, loot.content, 0, 0)
 			UTIL_Remove(hero)
-			
+
 			-- Apply modifier version of Aegis
 			newHero:AddNewModifier(newHero, nil, "modifier_aegis", {})
 		elseif loot.lootType == 5 then
