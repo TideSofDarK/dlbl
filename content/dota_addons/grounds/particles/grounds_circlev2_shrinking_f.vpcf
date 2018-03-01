@@ -65,7 +65,7 @@
 		},
 		{
 			_class = "C_INIT_RingWave"
-			m_flInitialRadius = 16352.0
+			m_flInitialRadius = 1.0
 			m_nOverrideCP = 1
 			m_flParticlesPerOrbit = 116.0
 			m_bEvenDistribution = true

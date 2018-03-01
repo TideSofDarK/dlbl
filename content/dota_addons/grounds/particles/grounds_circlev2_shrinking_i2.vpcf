@@ -111,10 +111,9 @@
 		},
 		{
 			_class = "C_INIT_PositionOffset"
-			m_OffsetMin = [ 0.0, 0.0, 384.0 ]
-			m_OffsetMax = [ 0.0, 0.0, 384.0 ]
+			m_OffsetMin = [ 0.0, 0.0, 8.0 ]
+			m_OffsetMax = [ 0.0, 0.0, 9.0 ]
 			m_nControlPointNumber = 2
-			m_bDisableOperator = true
 		},
 	]
 	m_Emitters = 

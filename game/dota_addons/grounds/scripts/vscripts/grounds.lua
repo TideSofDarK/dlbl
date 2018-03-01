@@ -157,7 +157,7 @@ function ShrinkingCricle(hero)
 		Timers:CreateTimer(function (  )
 			if not IsValidEntity(dummy) then
 			else
-				AddFOWViewer(2, origin, 32, 0.5, false)
+				AddFOWViewerAllTeams( origin, 32, 0.5 )
 				return 0.5
 			end
 		end)
@@ -188,7 +188,7 @@ function ShrinkingCricle(hero)
 			if not IsValidEntity(dummy) then
 
 			else
-				AddFOWViewer(2, origin, 32, 1.0, false)
+				AddFOWViewerAllTeams( origin, 32, 1.0 )
 				-- DebugDrawSphere(origin, Vector(255,0,0), 255, debug, true, 1.0) 
 				debug = debug - rate
 				return 1.0

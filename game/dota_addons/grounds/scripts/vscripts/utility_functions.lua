@@ -484,3 +484,9 @@ end
 function IsPointReachable( pos )
   return GridNav:CanFindPath(Vector(-6538.12, 103.942, 520), pos)
 end
+
+function AddFOWViewerAllTeams( origin, radius, time )
+  for i=2,13 do
+    AddFOWViewer(i, origin, radius, time, false)
+  end
+end
