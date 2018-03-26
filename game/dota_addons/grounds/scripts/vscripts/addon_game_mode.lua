@@ -209,6 +209,7 @@ function COverthrowGameMode:InitGameMode()
 	GameRules:GetGameModeEntity():SetExecuteOrderFilter( Dynamic_Wrap( COverthrowGameMode, "ExecuteOrderFilter" ), self )
 	GameRules:GetGameModeEntity():SetCustomGameForceHero("npc_dota_hero_wisp")
 	GameRules:GetGameModeEntity():SetBuybackEnabled( false )
+	GameRules:GetGameModeEntity():SetUnseenFogOfWarEnabled( true )
 
 	GameRules:GetGameModeEntity():SetExecuteOrderFilter( Dynamic_Wrap( COverthrowGameMode, "FilterExecuteOrder" ), self )
 
@@ -281,11 +282,36 @@ function COverthrowGameMode:Test()
 			-- 	return 0.5
 			-- end)
 
-			-- local item = CreateItem("item_loot_abilities", hero, spawnedUnit)
-			-- CreateItemOnPositionSync(hero:GetAbsOrigin(), item)
-			-- item:LaunchLoot(false, 100.0, 0.5, hero:GetAbsOrigin())
+			local item = CreateItem("item_loot_abilities", hero, spawnedUnit)
+			CreateItemOnPositionSync(hero:GetAbsOrigin(), item)
+			item:LaunchLoot(false, 100.0, 0.5, hero:GetAbsOrigin())
 
-			ShrinkingCricle(hero)
+			AddFOWViewer(hero:GetTeamNumber(), hero:GetAbsOrigin(), 99999999, 555, false)
+
+			-- local m1 = {}
+			-- for i=0,hero:GetModifierCount() do
+			-- 	table.insert(m1, hero:GetModifierNameByIndex(i))
+			-- end
+
+			local ab = hero:AddAbility("riki_permanent_invisibility")
+			ab:SetLevel(1)
+			ab:SetLevel(-1)
+
+			-- local m2 = {}
+			-- for i=0,hero:GetModifierCount() do
+			-- 	table.insert(m2, hero:GetModifierNameByIndex(i))
+			-- end			
+
+			-- for k,v in pairs(m2) do
+			-- 	for _,v2 in pairs(m1) do
+			-- 		if v == v2 then
+			-- 			break
+			-- 		end
+			-- 	end
+			-- 	hero:RemoveModifierByName(v)
+			-- end
+
+			-- ShrinkingCricle(hero)
 		end
 	end
 end

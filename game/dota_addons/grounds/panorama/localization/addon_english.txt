@@ -17,6 +17,7 @@
 
 	"gold" "Gold"
 	"xp" "XP"
+	"mana" "Mana Bonus"
 	"modifier_bonus_max_mana" "Bonus Mana"
 	"modifier_bonus_damage" "Bonus Damage"
 	"modifier_bonus_ms" "Bonus Movespeed"

@@ -13,3 +13,10 @@ if IsServer() then
 end
 
 function grounds_open_crate:IsHiddenAbilityCastable() return true end
+
+function OnUpgradeMana( keys )
+	local caster = keys.caster
+	local ability = keys.ability
+	print(caster:GetModifierStackCount("modifier_mana_passive", caster) + 1)
+	caster:SetModifierStackCount("modifier_mana_passive", caster, caster:GetModifierStackCount("modifier_mana_passive", caster) + 1)
+end

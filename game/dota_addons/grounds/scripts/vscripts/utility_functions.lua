@@ -313,7 +313,7 @@ function CDOTA_BaseNPC:GetAllAbilities()
   local abilities = {}
   for i=0,23 do
     local ab = self:GetAbilityByIndex(i)
-    if IsValidEntity(ab) and not string.match(ab:GetName(), "barebones") and ab:GetName() ~= "grounds_open_crate" then
+    if IsValidEntity(ab) and not string.match(ab:GetName(), "barebones") and not string.match(ab:GetName(), "grounds_") then
       table.insert(abilities, ab)
     end
   end

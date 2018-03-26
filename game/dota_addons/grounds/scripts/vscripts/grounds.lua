@@ -50,6 +50,7 @@ for k,v in pairs(LootTableOverride.Abilities.Rare) do
 end
 
 _G.GROUNDS_MAX_ABILITIES = 12
+_G.GROUNDS_CAMPS_RATE = 0.25
 
 _G.PlayerStates = {}
 for i=0,DOTA_MAX_PLAYERS do
@@ -91,8 +92,27 @@ function InitGrounds()
 
 	-- SpawnCrates()
 
-	for k,v in pairs(Entities:FindAllByName("grounds_crate_predefined")) do
+	local predefinedPoints = Entities:FindAllByName("grounds_crate_predefined")
+	local neutralPoints = GetRandomElements(predefinedPoints, math.floor(GetTableLength(predefinedPoints) * GROUNDS_CAMPS_RATE), nil)
+
+	for _,v in pairs(predefinedPoints) do
+		for __,v2 in pairs(neutralPoints) do
+			if v == v2 then
+				predefinedPoints[_] = nil
+			end
+		end
+	end
+
+	for k,v in pairs(predefinedPoints) do
 		SpawnCrate( v:GetAbsOrigin() )
+	end
+
+	for k,v in pairs(neutralPoints) do
+		local spawner = SpawnEntityFromTableSynchronous("npc_dota_neutral_spawner", { NeutralType = 0, PullType = 0, AggroType = 1, VolumeName = DoUniqueString("camp"), BatchLimit = 1 })
+		spawner:SetAbsOrigin(v:GetAbsOrigin())
+		spawner:SetAngles(0, 0, math.random(0, 360))
+
+		v:RemoveSelf()
 	end
 
 	CustomGameEventManager:RegisterListener("grounds_claim", Dynamic_Wrap( COverthrowGameMode, "OnPlayerClaimedReward" ))
@@ -370,6 +390,7 @@ function OnAbilityCratePicked( owner )
 		quality = "Common"
 	end
 
+	-- Grab all upgradable abilities
 	local upgradableAbilities = {}
 	for k,v in pairs(owner:GetAllAbilities()) do
 		if v:GetLevel() < v:GetMaxLevel() then
@@ -377,7 +398,7 @@ function OnAbilityCratePicked( owner )
 		end
 	end
 
-	-- List of all abilities
+	-- Grab all abilities
 	local allContents = {}
 	for k,v in pairs(PlayerStates[pID].Abilities[quality]) do
 		table.insert(allContents, k)
@@ -385,21 +406,20 @@ function OnAbilityCratePicked( owner )
 
 	local contents = {}
 
-	local atLeastOneUpgrade = false
+	-- local atLeastOneUpgrade = false
+	local isUpgrade = math.random(0,3) == 0 and GetTableLength(upgradableAbilities) >= 3
 
 	for i=1,3 do
 		--local isUpgrade = PlayerStates[pID].bCompleteBuild or math.random(0,1) == 0	
-		if isUpgrade then
-			atLeastOneUpgrade = true
-		end
+		-- if isUpgrade then
+		-- 	atLeastOneUpgrade = true
+		-- end
 
-		if i == 3 and not atLeastOneUpgrade then
-			isUpgrade = true
-		end
-
-		local isUpgrade = false
+		-- if i == 3 and not atLeastOneUpgrade then
+		-- 	isUpgrade = true
+		-- end
 		
-		if GetTableLength(upgradableAbilities) > 0 and isUpgrade then
+		if isUpgrade then
 			local ability = GetRandomElement(upgradableAbilities, nil, true)
 			table.insert(contents, ability)
 
@@ -664,6 +684,14 @@ function COverthrowGameMode:OnPlayerClaimedReward( keys )
 				PopupGoldGain(hero, gold)
 			elseif loot.content == "illusions" then
 				CreateIllusions(hero,2,120,200,50,128)
+			elseif loot.content == "mana" then
+				local manaPassive = hero:FindAbilityByName("grounds_mana")
+
+				if manaPassive then
+					manaPassive:SetHidden(false)
+					manaPassive:UpgradeAbility(true)
+					hero:SetMana(hero:GetMaxMana())
+				end
 			elseif string.match(loot.content, "modifier_") then
 				local modifierTable = {}
 				local unique = false
@@ -698,6 +726,9 @@ function COverthrowGameMode:OnPlayerClaimedReward( keys )
 
 			-- Apply modifier version of Aegis
 			newHero:AddNewModifier(newHero, nil, "modifier_aegis", {})
+
+			-- Add mana passive
+			newHero:AddAbility("grounds_mana")
 		elseif loot.lootType == 5 then
 			hero:AddItemByName(loot.content)
 		end
